@@ -42,18 +42,11 @@ const observer = new IntersectionObserver(entries => {
             observer.unobserve(entry.target);
         }
     });
-}, { threshold: 0.2 });
+}, {
+    threshold: 0.2
+});
 
+// Observer les éléments
 document.querySelectorAll('.feature-card, .command-category, .config-card, .support-card, .legal-card').forEach(el => {
     observer.observe(el);
 });
-
-// Récupération des stats dynamiques
-fetch("http://localhost:3000/api/stats")
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("stat-servers").innerText = data.servers.toLocaleString();
-        document.getElementById("stat-users").innerText = data.users.toLocaleString();
-        document.getElementById("stat-uptime").innerText = data.uptime + "h";
-    })
-    .catch(err => console.error("Erreur API stats", err));
