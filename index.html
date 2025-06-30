@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YAKO - Bot Discord Administrateur</title>
-    <meta name="description" content="YAKO - Le bot Discord administrateur ultime pour gérer votre serveur avec puissance et simplicité.">
+    <meta name="description" content="YAKO - Le bot Discord administrateur ultime pour gérer votre serveur avec puissance et simplicité. Modération avancée, gestion des rôles, statistiques et bien plus.">
     <meta name="keywords" content="discord bot, modération, administration, serveur discord, YAKO">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/style.css" />
+    <link href="./css/style.css" rel="stylesheet" />
 </head>
 <body>
 
@@ -26,7 +26,7 @@
             <a href="#commands" class="nav-link">Commandes</a>
             <a href="#support" class="nav-link">Support</a>
             <a href="#legal" class="nav-link">Légal</a>
-            <a href="#invite" class="nav-link cta-button">Inviter YAKO</a>
+            <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" target="_blank" class="nav-link cta-button">Inviter YAKO</a>
         </div>
         <div class="hamburger">
             <span></span>
@@ -67,15 +67,22 @@
                     </div>
                 </div>
                 <div class="hero-buttons">
-                    <a href="#invite" class="btn-primary"><i class="fab fa-discord"></i> Inviter YAKO</a>
-                    <a href="#features" class="btn-secondary"><i class="fas fa-info-circle"></i> En savoir plus</a>
+                    <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" class="btn-primary" target="_blank">
+                        <i class="fab fa-discord"></i> Inviter YAKO
+                    </a>
+                    <a href="#features" class="btn-secondary">
+                        <i class="fas fa-info-circle"></i> En savoir plus
+                    </a>
                 </div>
             </div>
             <div class="hero-image">
+                <!-- Discord preview conservé -->
                 <div class="bot-preview">
                     <div class="discord-mockup">
                         <div class="discord-header">
-                            <div class="discord-controls"><span></span><span></span><span></span></div>
+                            <div class="discord-controls">
+                                <span></span><span></span><span></span>
+                            </div>
                             <span>Mon Serveur Discord</span>
                         </div>
                         <div class="discord-content">
@@ -115,9 +122,65 @@
     </div>
 </section>
 
-<!-- Features, Setup, Commands, Support, Invite, Footer -->
-<!-- (Toutes ces sections sont déjà dans le code original que tu m'as donné.) -->
-<!-- Tu peux simplement les conserver identiques. -->
+<!-- Les sections Features, Setup, Commands, Support, Legal conservent leur code existant -->
+<!-- Tu n’as pas besoin de les recopier ici si elles sont déjà complètes -->
+
+<!-- Invite Section -->
+<section id="invite" class="invite">
+    <div class="container">
+        <div class="invite-content">
+            <h2>Prêt à Améliorer Votre Serveur ?</h2>
+            <p>Rejoignez des milliers d'administrateurs qui font confiance à YAKO pour gérer leur communauté Discord avec efficacité et professionnalisme.</p>
+            <div class="invite-buttons">
+                <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" class="btn-invite" target="_blank">
+                    <i class="fab fa-discord"></i> Inviter YAKO sur mon serveur
+                </a>
+            </div>
+            <div class="invite-info">
+                <div class="info-item">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Permissions d'administrateur requises pour un fonctionnement optimal</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-bolt"></i>
+                    <span>Configuration automatique en moins de 2 minutes</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-heart"></i>
+                    <span>Gratuit pour toujours avec options premium disponibles</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-robot"></i>
+                <span>YAKO</span>
+            </div>
+            <div class="footer-links">
+                <a href="#home">Accueil</a>
+                <a href="#features">Fonctionnalités</a>
+                <a href="#commands">Commandes</a>
+                <a href="#support">Support</a>
+                <a href="https://yako-bot.com/terms-of-service" target="_blank">Conditions</a>
+                <a href="https://yako-bot.com/privacy-policy" target="_blank">Confidentialité</a>
+            </div>
+            <div class="footer-social">
+                <a href="https://discord.gg/yako" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
+                <a href="https://github.com/yako-bot" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/yako_bot" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 YAKO Bot. Tous droits réservés. Développé avec ❤️ pour la communauté Discord.</p>
+        </div>
+    </div>
+</footer>
 
 <!-- Relier le script -->
 <script src="./js/script.js"></script>

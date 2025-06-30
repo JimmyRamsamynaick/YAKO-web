@@ -298,3 +298,79 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+.discord-mockup {
+    background: #1e1e1e;
+    border-radius: 8px;
+    padding: 20px;
+    color: #d4d4d4;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    border: 1px solid #333;
+    overflow: auto;
+}
+
+.discord-header {
+    color: #9cdcfe;
+    font-weight: bold;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+}
+
+.discord-content .message {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.discord-content .avatar {
+    width: 32px;
+    height: 32px;
+    background: #333;
+    border-radius: 50%;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.discord-content .message-content {
+    background: rgba(255,255,255,0.03);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.discord-content .username {
+    color: #569cd6;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.discord-content .bot-tag {
+    background: #5865f2;
+    color: #fff;
+    padding: 1px 4px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+}
+
+.discord-content .embed {
+    background: #252526;
+    border-left: 4px solid #007acc;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 6px;
+}
+
+.discord-content .embed h4 {
+    color: #dcdcaa;
+    margin: 0 0 4px 0;
+}
+
+.discord-content .embed p {
+    margin: 0;
+    color: #9cdcfe;
+}
