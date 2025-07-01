@@ -99,6 +99,7 @@ Tester les fonctionnalités
 Scrollez pour voir le navbar sticky & les animations
 Cliquez sur le hamburger en mobile
 Invitez YAKO via le lien “Inviter YAKO”
+
 ⚙️ Personnalisation & Configuration
 Thème Modifiez les couleurs globales dans css/style.css sous :root { … }.
 Sections Ajoutez/retirez les <section id="…"> pour “Features”, “Commands”, “Support”, “Legal”.
@@ -107,7 +108,8 @@ Scripts
 copyToClipboard(text) → fonction de copie vers le presse-papier
 Intersection Observer → threshold modifiable
 Navbar scroll threshold dans script.js
-Fonts & Icons Changez la source Google Fonts ou Font Awesome selon vos préférences.
+Fonts & Icons Changez la source Google Fonts ou Font Awesome selon vos préférences. 
+
 📜 Commandes principales
 Exemples de commandes disponibles sur YAKO :
 Commande	Description
