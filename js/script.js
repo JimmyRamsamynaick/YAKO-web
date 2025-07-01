@@ -1,4 +1,4 @@
-// script.js
+// support.js
 
 // Menu hamburger
 const hamburger = document.querySelector('.hamburger');
