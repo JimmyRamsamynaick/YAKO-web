@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YAKO - Bot Discord Administrateur</title>
-    <meta name="description" content="YAKO - Le bot Discord administrateur ultime pour gérer votre serveur avec puissance et simplicité. Modération avancée, gestion des rôles, statistiques et bien plus.">
+    <meta name="description" content="YAKO - Le bot Discord administrateur ultime pour gérer votre serveur avec puissance et simplicité.">
     <meta name="keywords" content="discord bot, modération, administration, serveur discord, YAKO">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="./css/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
 
 <!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <div class="nav-logo">
+        <a href="#home" class="nav-logo">
             <i class="fas fa-robot"></i>
             <span>YAKO</span>
-        </div>
+        </a>
         <div class="nav-menu">
             <a href="#home" class="nav-link">Accueil</a>
             <a href="#features" class="nav-link">Fonctionnalités</a>
@@ -29,9 +29,7 @@
             <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" target="_blank" class="nav-link cta-button">Inviter YAKO</a>
         </div>
         <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span></span><span></span><span></span>
         </div>
     </div>
 </nav>
@@ -48,10 +46,11 @@
     </div>
     <div class="container">
         <div class="hero-content">
-            <div class="hero-text">
+            <div class="hero-text animate">
                 <h1>YAKO</h1>
                 <p class="hero-subtitle">Le Bot Discord Administrateur Ultime</p>
-                <p class="hero-description">Gérez votre serveur Discord avec puissance et simplicité. YAKO offre des outils d'administration avancés pour maintenir l'ordre et améliorer l'expérience de votre communauté.</p>
+                <p class="hero-description">Gérez votre serveur Discord avec puissance et simplicité. YAKO offre des outils d'administration avancés pour maintenir l'ordre et améliorer l’expérience de votre communauté.</p>
+
                 <div class="hero-stats">
                     <div class="stat">
                         <span class="stat-number">1000+</span>
@@ -66,6 +65,7 @@
                         <span class="stat-label">Uptime</span>
                     </div>
                 </div>
+
                 <div class="hero-buttons">
                     <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" class="btn-primary" target="_blank">
                         <i class="fab fa-discord"></i> Inviter YAKO
@@ -75,8 +75,8 @@
                     </a>
                 </div>
             </div>
-            <div class="hero-image">
-                <!-- Discord preview conservé -->
+
+            <div class="hero-image animate">
                 <div class="bot-preview">
                     <div class="discord-mockup">
                         <div class="discord-header">
@@ -122,8 +122,7 @@
     </div>
 </section>
 
-<!-- Les sections Features, Setup, Commands, Support, Legal conservent leur code existant -->
-<!-- Tu n’as pas besoin de les recopier ici si elles sont déjà complètes -->
+<!-- Sections Features / Setup / Commands à conserver depuis ta version originale -->
 
 <!-- Invite Section -->
 <section id="invite" class="invite">
@@ -167,13 +166,12 @@
                 <a href="#features">Fonctionnalités</a>
                 <a href="#commands">Commandes</a>
                 <a href="./html/support.html">Support</a>
-                <a href="https://yako-bot.com/terms-of-service" target="_blank">Conditions</a>
-                <a href="https://yako-bot.com/privacy-policy" target="_blank">Confidentialité</a>
+                <a href="./html/legal.html">Légal</a>
             </div>
             <div class="footer-social">
-                <a href="https://discord.gg/yako" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
-                <a href="https://github.com/yako-bot" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-                <a href="https://twitter.com/yako_bot" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://discord.gg/yako" target="_blank"><i class="fab fa-discord"></i></a>
+                <a href="https://github.com/yako-bot" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/yako_bot" target="_blank"><i class="fab fa-twitter"></i></a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -182,7 +180,7 @@
     </div>
 </footer>
 
-<!-- Relier le script -->
+<!-- Scripts -->
 <script src="./js/script.js"></script>
 </body>
 </html>
