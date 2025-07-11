@@ -1,201 +1,401 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support - YAKO Bot Discord</title>
-    <meta name="description" content="Contactez l'équipe YAKO pour obtenir de l'aide avec votre bot Discord. Support technique, questions et assistance personnalisée.">
-    <meta name="keywords" content="support, aide, contact, YAKO bot, discord">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="./css/support.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAKO Bot - Support</title>
+    <link rel="stylesheet" href="css/support.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-
-<!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="../index.html" class="nav-logo">
+        <div class="nav-brand">
             <i class="fas fa-robot"></i>
             <span>YAKO</span>
-        </a>
+        </div>
         <div class="nav-menu">
             <a href="../index.html" class="nav-link">Accueil</a>
-            <a href="../index.html#features" class="nav-link">Fonctionnalités</a>
-            <a href="./configuration.html" class="nav-link">Configuration</a>
-            <a href="../index.html#commands" class="nav-link">Commandes</a>
+            <a href="fonctionnalites.html" class="nav-link">Fonctionnalités</a>
             <a href="support.html" class="nav-link active">Support</a>
-            <a href="./legal.html" class="nav-link">Légal</a>
-            <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" target="_blank" class="nav-link cta-button">Inviter YAKO</a>
+            <a href="legal.html" class="nav-link">Légal</a>
         </div>
-        <div class="hamburger">
-            <span></span><span></span><span></span>
+        <div class="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </div>
 </nav>
 
-<!-- Support Hero -->
-<section class="support-hero">
-    <div class="container">
-        <div class="support-hero-content">
-            <h1>Centre de Support</h1>
-            <p>Notre équipe est là pour vous aider à tirer le meilleur parti de YAKO. Contactez-nous pour toute question ou assistance technique.</p>
-            <div class="support-icons">
-                <div class="support-icon">
-                    <i class="fas fa-headset"></i>
-                    <span>Support 24/7</span>
-                </div>
-                <div class="support-icon">
-                    <i class="fas fa-bolt"></i>
-                    <span>Réponse Rapide</span>
-                </div>
-                <div class="support-icon">
-                    <i class="fas fa-users"></i>
-                    <span>Équipe Expert</span>
-                </div>
-            </div>
+<main>
+    <section class="hero">
+        <div class="container">
+            <h1><i class="fas fa-headset"></i> Centre d'Aide YAKO</h1>
+            <p>Nous sommes là pour vous aider ! Trouvez des réponses ou contactez notre équipe.</p>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Contact Section -->
-<section class="contact-section">
-    <div class="container">
-        <div class="contact-container">
-            <div class="contact-info">
-                <h2>Parlons ensemble</h2>
-                <p>Que vous ayez une question technique, besoin d'aide pour la configuration, ou simplement envie de partager vos commentaires, nous sommes là pour vous écouter.</p>
-                <div class="contact-methods">
-                    <a href="https://discord.gg/UTrYfA3n58" target="_blank" class="contact-method">
-                        <i class="fab fa-discord"></i>
-                        <div class="contact-method-content">
-                            <h4>Discord Community</h4>
-                            <p>Rejoignez notre serveur pour obtenir de l'aide instantanée</p>
-                        </div>
-                    </a>
-                    <div class="contact-method">
-                        <i class="fas fa-envelope"></i>
-                        <div class="contact-method-content">
-                            <h4>Email Direct</h4>
-                            <p>Réponse sous 24h maximum</p>
-                        </div>
-                    </div>
-                    <div class="contact-method">
+    <section class="support-options">
+        <div class="container">
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">
                         <i class="fas fa-book"></i>
-                        <div class="contact-method-content">
-                            <h4>Documentation</h4>
-                            <p>Guides complets et tutoriels détaillés</p>
+                    </div>
+                    <h3>Documentation</h3>
+                    <p>Consultez notre guide complet pour configurer et utiliser YAKO</p>
+                    <a href="#faq" class="btn btn-outline">Voir la FAQ</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fab fa-discord"></i>
+                    </div>
+                    <h3>Serveur Discord</h3>
+                    <p>Rejoignez notre communauté pour obtenir de l'aide instantanée</p>
+                    <a href="#" class="btn btn-outline">Rejoindre</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Contact Email</h3>
+                    <p>Envoyez-nous un message détaillé, nous répondons sous 24h</p>
+                    <a href="#contact" class="btn btn-primary">Nous contacter</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <h2><i class="fas fa-question-circle"></i> Questions Fréquentes</h2>
+            <div class="faq-container">
+                <div class="faq-category">
+                    <h3><i class="fas fa-plus-circle"></i> Installation & Configuration</h3>
+                    <div class="faq-items">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Comment inviter YAKO sur mon serveur ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Pour inviter YAKO sur votre serveur Discord :</p>
+                                <ol>
+                                    <li>Cliquez sur le bouton "Ajouter à Discord" sur notre site</li>
+                                    <li>Connectez-vous à votre compte Discord si nécessaire</li>
+                                    <li>Sélectionnez le serveur où vous voulez ajouter YAKO</li>
+                                    <li>Accordez les permissions nécessaires</li>
+                                    <li>Utilisez <code>/setup</code> pour configurer le bot</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Quelles permissions YAKO a-t-il besoin ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>YAKO nécessite les permissions suivantes pour fonctionner correctement :</p>
+                                <ul>
+                                    <li><strong>Gérer les messages</strong> - Pour la modération automatique</li>
+                                    <li><strong>Gérer les rôles</strong> - Pour l'attribution automatique de rôles</li>
+                                    <li><strong>Exclure des membres</strong> - Pour les sanctions</li>
+                                    <li><strong>Bannir des membres</strong> - Pour les sanctions sévères</li>
+                                    <li><strong>Envoyer des messages</strong> - Pour les réponses et notifications</li>
+                                    <li><strong>Gérer les webhooks</strong> - Pour les logs avancés</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Comment configurer l'auto-modération ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Pour configurer l'auto-modération :</p>
+                                <ol>
+                                    <li>Utilisez la commande <code>/setup moderation</code></li>
+                                    <li>Définissez les sanctions avec <code>/automod penalties</code></li>
+                                    <li>Configurez les filtres avec <code>/automod filters</code></li>
+                                    <li>Testez avec <code>/automod test</code></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h3><i class="fas fa-cogs"></i> Utilisation & Fonctionnalités</h3>
+                    <div class="faq-items">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Comment voir toutes les commandes disponibles ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Utilisez la commande <code>/help</code> pour voir toutes les commandes disponibles. Vous pouvez aussi utiliser <code>/help [nom_commande]</code> pour obtenir des détails sur une commande spécifique.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Comment créer des rôles automatiques ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Pour configurer les rôles automatiques :</p>
+                                <ol>
+                                    <li>Utilisez <code>/autorole setup</code></li>
+                                    <li>Sélectionnez le rôle à attribuer automatiquement</li>
+                                    <li>Choisissez les conditions (nouveau membre, réaction, etc.)</li>
+                                    <li>Confirmez la configuration</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>YAKO peut-il jouer de la musique ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Oui ! YAKO dispose d'un lecteur musique intégré. Utilisez :</p>
+                                <ul>
+                                    <li><code>/play [url/titre]</code> - Jouer une musique</li>
+                                    <li><code>/pause</code> - Mettre en pause</li>
+                                    <li><code>/skip</code> - Passer à la suivante</li>
+                                    <li><code>/queue</code> - Voir la file d'attente</li>
+                                    <li><code>/stop</code> - Arrêter la musique</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Problèmes & Dépannage</h3>
+                    <div class="faq-items">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>YAKO ne répond pas à mes commandes</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Si YAKO ne répond pas, vérifiez :</p>
+                                <ul>
+                                    <li>Que YAKO est en ligne (statut vert)</li>
+                                    <li>Que vous utilisez les slash commands (/commande)</li>
+                                    <li>Que YAKO a les permissions dans le salon</li>
+                                    <li>Que votre rôle est suffisamment élevé</li>
+                                </ul>
+                                <p>Si le problème persiste, contactez le support.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Comment signaler un bug ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Pour signaler un bug :</p>
+                                <ol>
+                                    <li>Rejoignez notre serveur Discord de support</li>
+                                    <li>Utilisez le salon #bug-reports</li>
+                                    <li>Décrivez le problème en détail</li>
+                                    <li>Incluez des captures d'écran si possible</li>
+                                    <li>Mentionnez les étapes pour reproduire le bug</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>YAKO est-il gratuit ?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Oui, YAKO est entièrement gratuit ! Toutes les fonctionnalités de base sont disponibles sans frais. Nous offrons aussi un support premium pour les serveurs avec des besoins spécifiques.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="contact-form">
-                <form action="https://formspree.io/f/xvgrvkqr" method="POST">
-                    <div class="form-group">
-                        <label for="email">Votre email</label>
-                        <input type="email" id="email" name="email" class="form-control" placeholder="votre@email.com" required>
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2><i class="fas fa-envelope"></i> Contactez Notre Équipe</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Besoin d'aide personnalisée ?</h3>
+                    <p>Notre équipe de support est disponible 24/7 pour vous aider avec toutes vos questions concernant YAKO.</p>
+
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Temps de réponse</h4>
+                                <p>Moins de 24 heures</p>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-globe"></i>
+                            <div>
+                                <h4>Langues supportées</h4>
+                                <p>Français, Anglais</p>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <h4>Support prioritaire</h4>
+                                <p>Serveurs vérifiés</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="subject">Sujet</label>
-                        <input type="text" id="subject" name="subject" class="form-control" placeholder="En quoi pouvons-nous vous aider ?" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Votre message</label>
-                        <textarea id="message" name="message" class="form-control" placeholder="Décrivez votre problème ou votre question en détail..." required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-paper-plane"></i>
-                        Envoyer le message
-                    </button>
-                </form>
+                </div>
+
+                <div class="contact-form-container">
+                    <form class="contact-form" action="https://formspree.io/f/xvgrvkqr" method="POST">
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i>
+                                Votre email
+                            </label>
+                            <input type="email" id="email" name="email" required placeholder="votre@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="server">
+                                <i class="fas fa-server"></i>
+                                ID de votre serveur (optionnel)
+                            </label>
+                            <input type="text" id="server" name="server_id" placeholder="123456789012345678">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">
+                                <i class="fas fa-tags"></i>
+                                Catégorie
+                            </label>
+                            <select id="category" name="category" required>
+                                <option value="">Sélectionnez une catégorie</option>
+                                <option value="setup">Installation & Configuration</option>
+                                <option value="bug">Signalement de bug</option>
+                                <option value="feature">Demande de fonctionnalité</option>
+                                <option value="moderation">Problème de modération</option>
+                                <option value="music">Problème de musique</option>
+                                <option value="other">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">
+                                <i class="fas fa-heading"></i>
+                                Sujet
+                            </label>
+                            <input type="text" id="subject" name="subject" required placeholder="Résumé de votre problème">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">
+                                <i class="fas fa-comment"></i>
+                                Votre message
+                            </label>
+                            <textarea id="message" name="message" required rows="6" placeholder="Décrivez votre problème ou question en détail..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="newsletter">
+                                <span class="checkmark"></span>
+                                Je souhaite recevoir les actualités de YAKO
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="fas fa-paper-plane"></i>
+                            Envoyer le message
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- FAQ Section -->
-<section class="faq-section">
-    <div class="container">
-        <h2>Questions Fréquentes</h2>
-        <div class="faq-grid">
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>Comment inviter YAKO sur mon serveur ?</h4>
-                    <i class="fas fa-chevron-down"></i>
+    <section class="resources-section">
+        <div class="container">
+            <h2><i class="fas fa-book-open"></i> Ressources Utiles</h2>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3>Tutoriels Vidéo</h3>
+                    <p>Guides vidéo pour configurer et utiliser YAKO efficacement</p>
+                    <a href="#" class="resource-link">Voir les tutoriels <i class="fas fa-external-link-alt"></i></a>
                 </div>
-                <div class="faq-answer">
-                    <p>Cliquez sur le bouton "Inviter YAKO" en haut de la page ou utilisez le lien d'invitation. Assurez-vous d'avoir les permissions d'administrateur sur votre serveur Discord.</p>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>Documentation API</h3>
+                    <p>Documentation complète pour les développeurs</p>
+                    <a href="#" class="resource-link">Consulter l'API <i class="fas fa-external-link-alt"></i></a>
                 </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>YAKO ne répond pas à mes commandes</h4>
-                    <i class="fas fa-chevron-down"></i>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Communauté</h3>
+                    <p>Rejoignez notre communauté Discord pour échanger avec d'autres utilisateurs</p>
+                    <a href="#" class="resource-link">Rejoindre <i class="fas fa-external-link-alt"></i></a>
                 </div>
-                <div class="faq-answer">
-                    <p>Vérifiez que YAKO a les permissions nécessaires et que vous utilisez le bon préfixe (par défaut /). Consultez la liste des commandes dans la section dédiée.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>Comment configurer la modération automatique ?</h4>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>Utilisez la commande !setup pour accéder au panneau de configuration. Vous pourrez définir les règles de modération, les sanctions et les canaux de logs.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>YAKO est-il gratuit ?</h4>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>Oui, YAKO est entièrement gratuit avec toutes les fonctionnalités de base. Des options premium seront disponibles prochainement pour des fonctionnalités avancées.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>Puis-je personnaliser les commandes de YAKO ?</h4>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    <p>Absolument ! YAKO propose de nombreuses options de personnalisation, y compris les alias de commandes, les rôles personnalisés et les messages automatiques.</p>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <h3>Blog & Actualités</h3>
+                    <p>Restez informé des dernières mises à jour et fonctionnalités</p>
+                    <a href="#" class="resource-link">Lire le blog <i class="fas fa-external-link-alt"></i></a>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+</main>
 
-<!-- Footer -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
-            <div class="footer-logo">
-                <i class="fas fa-robot"></i>
-                <span>YAKO</span>
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <i class="fas fa-robot"></i>
+                    <span>YAKO</span>
+                </div>
+                <p>Le bot Discord de référence pour l'administration de serveurs.</p>
             </div>
-            <div class="footer-links">
-                <a href="../index.html">Accueil</a>
-                <a href="../index.html#features">Fonctionnalités</a>
-                <a href="../index.html#commands">Commandes</a>
-                <a href="support.html">Support</a>
-                <a href="https://yako-bot.com/terms-of-service" target="_blank">Conditions</a>
-                <a href="https://yako-bot.com/privacy-policy" target="_blank">Confidentialité</a>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="fonctionnalites.html">Fonctionnalités</a></li>
+                    <li><a href="legal.html">Mentions légales</a></li>
+                </ul>
             </div>
-            <div class="footer-social">
-                <a href="https://discord.gg/yako" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
-                <a href="https://github.com/yako-bot" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-                <a href="https://twitter.com/yako_bot" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 YAKO Bot. Tous droits réservés. Développé avec ❤️ pour la communauté Discord.</p>
+            <p>&copy; 2025 YAKO Bot. Tous droits réservés.</p>
         </div>
     </div>
 </footer>
 
-<script src="./js/support.js"></script>
+<script src="js/support.js"></script>
 </body>
 </html>

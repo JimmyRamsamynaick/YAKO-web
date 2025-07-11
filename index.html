@@ -1,187 +1,158 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YAKO - Bot Discord Administrateur</title>
-    <meta name="description" content="YAKO - Le bot Discord administrateur ultime pour gérer votre serveur avec puissance et simplicité.">
-    <meta name="keywords" content="discord bot, modération, administration, serveur discord, YAKO">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAKO Bot - Administration Discord</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-
-<!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="#home" class="nav-logo">
+        <div class="nav-brand">
             <i class="fas fa-robot"></i>
             <span>YAKO</span>
-        </a>
-        <div class="nav-menu">
-            <a href="#home" class="nav-link">Accueil</a>
-            <a href="#features" class="nav-link">Fonctionnalités</a>
-            <a href="./html/configuration.html" class="nav-link">Configuration</a>
-            <a href="#commands" class="nav-link">Commandes</a>
-            <a href="./html/support.html" class="nav-link">Support</a>
-            <a href="./html/legal.html" class="nav-link">Légal</a>
-            <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" target="_blank" class="nav-link cta-button">Inviter YAKO</a>
         </div>
-        <div class="hamburger">
-            <span></span><span></span><span></span>
+        <div class="nav-menu">
+            <a href="index.html" class="nav-link active">Accueil</a>
+            <a href="html/fonctionnalites.html" class="nav-link">Fonctionnalités</a>
+            <a href="html/support.html" class="nav-link">Support</a>
+            <a href="html/legal.html" class="nav-link">Légal</a>
+        </div>
+        <div class="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </div>
 </nav>
 
-<!-- Hero Section -->
-<section id="home" class="hero">
-    <div class="hero-background">
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-        </div>
-    </div>
-    <div class="container">
+<main>
+    <section class="hero">
         <div class="hero-content">
-            <div class="hero-text animate">
-                <h1>YAKO</h1>
-                <p class="hero-subtitle">Le Bot Discord Administrateur Ultime</p>
-                <p class="hero-description">Gérez votre serveur Discord avec puissance et simplicité. YAKO offre des outils d'administration avancés pour maintenir l'ordre et améliorer l’expérience de votre communauté.</p>
-
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-number">1000+</span>
-                        <span class="stat-label">Serveurs</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">50k+</span>
-                        <span class="stat-label">Utilisateurs</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">99.9%</span>
-                        <span class="stat-label">Uptime</span>
-                    </div>
-                </div>
-
+            <div class="hero-text">
+                <h1>Bienvenue sur <span class="highlight">YAKO</span></h1>
+                <p class="hero-description">
+                    Le bot Discord ultime pour administrer vos serveurs avec facilité et efficacité.
+                    Automatisez vos tâches, gérez vos membres et créez une communauté florissante.
+                </p>
                 <div class="hero-buttons">
-                    <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" class="btn-primary" target="_blank">
-                        <i class="fab fa-discord"></i> Inviter YAKO
+                    <a href="#" class="btn btn-primary">
+                        <i class="fab fa-discord"></i>
+                        Ajouter à Discord
                     </a>
-                    <a href="#features" class="btn-secondary">
-                        <i class="fas fa-info-circle"></i> En savoir plus
+                    <a href="html/fonctionnalites.html" class="btn btn-secondary">
+                        <i class="fas fa-list"></i>
+                        Découvrir les fonctionnalités
                     </a>
                 </div>
             </div>
+            <div class="hero-image">
+                <div class="robot-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <div class="hero-image animate">
-                <div class="bot-preview">
-                    <div class="discord-mockup">
-                        <div class="discord-header">
-                            <div class="discord-controls">
-                                <span></span><span></span><span></span>
-                            </div>
-                            <span>Mon Serveur Discord</span>
-                        </div>
-                        <div class="discord-content">
-                            <div class="message">
-                                <div class="avatar">Y</div>
-                                <div class="message-content">
-                                    <span class="username">YAKO</span>
-                                    <span class="bot-tag">BOT</span>
-                                    <p>🛡️ Serveur sécurisé ! Modération active.</p>
-                                </div>
-                            </div>
-                            <div class="message">
-                                <div class="avatar user-avatar">U</div>
-                                <div class="message-content">
-                                    <span class="username">Utilisateur</span>
-                                    <p>!stats</p>
-                                </div>
-                            </div>
-                            <div class="message">
-                                <div class="avatar">Y</div>
-                                <div class="message-content">
-                                    <span class="username">YAKO</span>
-                                    <span class="bot-tag">BOT</span>
-                                    <div class="embed">
-                                        <div class="embed-content">
-                                            <h4>📊 Statistiques du serveur</h4>
-                                            <p>Membres: 1,234 | En ligne: 567</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <section class="features-preview">
+        <div class="container">
+            <h2>Pourquoi choisir YAKO ?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
+                    <h3>Modération Avancée</h3>
+                    <p>Protégez votre serveur avec des outils de modération intelligents et automatisés.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Gestion des Membres</h3>
+                    <p>Gérez facilement les rôles, permissions et interactions de vos membres.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Configuration Simple</h3>
+                    <p>Interface intuitive pour configurer toutes les fonctionnalités en quelques clics.</p>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Sections Features / Setup / Commands à conserver depuis ta version originale -->
-
-<!-- Invite Section -->
-<section id="invite" class="invite">
-    <div class="container">
-        <div class="invite-content">
-            <h2>Prêt à Améliorer Votre Serveur ?</h2>
-            <p>Rejoignez des milliers d'administrateurs qui font confiance à YAKO pour gérer leur communauté Discord avec efficacité et professionnalisme.</p>
-            <div class="invite-buttons">
-                <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" class="btn-invite" target="_blank">
-                    <i class="fab fa-discord"></i> Inviter YAKO sur mon serveur
-                </a>
-            </div>
-            <div class="invite-info">
-                <div class="info-item">
-                    <i class="fas fa-shield-check"></i>
-                    <span>Permissions d'administrateur requises pour un fonctionnement optimal</span>
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Serveurs actifs</div>
                 </div>
-                <div class="info-item">
-                    <i class="fas fa-bolt"></i>
-                    <span>Configuration automatique en moins de 2 minutes</span>
+                <div class="stat-item">
+                    <div class="stat-number">500,000+</div>
+                    <div class="stat-label">Utilisateurs satisfaits</div>
                 </div>
-                <div class="info-item">
-                    <i class="fas fa-heart"></i>
-                    <span>Gratuit pour toujours avec options premium disponibles</span>
+                <div class="stat-item">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Temps de disponibilité</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support technique</div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Footer -->
+    <section class="cta">
+        <div class="container">
+            <h2>Prêt à améliorer votre serveur Discord ?</h2>
+            <p>Rejoignez des milliers d'administrateurs qui font confiance à YAKO pour gérer leurs communautés.</p>
+            <a href="#" class="btn btn-primary btn-large">
+                <i class="fab fa-discord"></i>
+                Commencer maintenant
+            </a>
+        </div>
+    </section>
+</main>
+
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
-            <div class="footer-logo">
-                <i class="fas fa-robot"></i>
-                <span>YAKO</span>
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <i class="fas fa-robot"></i>
+                    <span>YAKO</span>
+                </div>
+                <p>Le bot Discord de référence pour l'administration de serveurs.</p>
             </div>
-            <div class="footer-links">
-                <a href="#home">Accueil</a>
-                <a href="#features">Fonctionnalités</a>
-                <a href="#commands">Commandes</a>
-                <a href="./html/support.html">Support</a>
-                <a href="./html/legal.html">Légal</a>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="html/fonctionnalites.html">Fonctionnalités</a></li>
+                    <li><a href="html/support.html">Support</a></li>
+                    <li><a href="html/legal.html">Mentions légales</a></li>
+                </ul>
             </div>
-            <div class="footer-social">
-                <a href="https://discord.gg/yako" target="_blank"><i class="fab fa-discord"></i></a>
-                <a href="https://github.com/yako-bot" target="_blank"><i class="fab fa-github"></i></a>
-                <a href="https://twitter.com/yako_bot" target="_blank"><i class="fab fa-twitter"></i></a>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 YAKO Bot. Tous droits réservés. Développé avec ❤️ pour la communauté Discord.</p>
+            <p>&copy; 2025 YAKO Bot. Tous droits réservés.</p>
         </div>
     </div>
 </footer>
 
-
-<!-- Scripts -->
 <script src="./js/script.js"></script>
 </body>
 </html>

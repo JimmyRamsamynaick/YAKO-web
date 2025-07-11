@@ -1,143 +1,806 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Légal - YAKO Bot Discord</title>
-    <meta name="description" content="Mentions légales, politique de confidentialité et conditions d'utilisation du bot YAKO pour Discord." />
-    <meta name="keywords" content="légal, privacy, terms, yako, discord bot" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/legal.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAKO Bot - Mentions Légales</title>
+    <link rel="stylesheet" href="css/legal.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-
-<!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="../index.html" class="nav-logo">
+        <div class="nav-brand">
             <i class="fas fa-robot"></i>
             <span>YAKO</span>
-        </a>
+        </div>
         <div class="nav-menu">
             <a href="../index.html" class="nav-link">Accueil</a>
-            <a href="../index.html#features" class="nav-link">Fonctionnalités</a>
-            <a href="./configuration.html" class="nav-link">Configuration</a>
-            <a href="../index.html#commands" class="nav-link">Commandes</a>
-            <a href="./support.html" class="nav-link">Support</a>
-            <a href="./legal.html" class="nav-link active">Légal</a>
-            <a href="https://discord.com/oauth2/authorize?client_id=1141863040795545610&permissions=8&integration_type=0&scope=bot" target="_blank" class="nav-link cta-button">Inviter YAKO</a>
+            <a href="fonctionnalites.html" class="nav-link">Fonctionnalités</a>
+            <a href="support.html" class="nav-link">Support</a>
+            <a href="legal.html" class="nav-link active">Légal</a>
         </div>
-        <div class="hamburger">
-            <span></span><span></span><span></span>
+        <div class="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </div>
 </nav>
 
-<!-- Hero Section -->
-<section class="legal-hero">
-    <div class="container legal-hero-content">
-        <div class="legal-icon"><i class="fas fa-scale-balanced"></i></div>
-        <h1>Informations légales</h1>
-        <p>Consultez les informations juridiques de YAKO : conditions d'utilisation, politique de confidentialité et mentions légales.</p>
-        <div class="legal-badges">
-            <div class="badge"><i class="fas fa-shield-alt"></i><span>Protection</span></div>
-            <div class="badge"><i class="fas fa-balance-scale"></i><span>Transparence</span></div>
+<main>
+    <section class="hero">
+        <div class="container">
+            <h1><i class="fas fa-balance-scale"></i> Informations Légales</h1>
+            <p>Toutes les informations légales concernant l'utilisation de YAKO Bot</p>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Navigation entre les sections -->
-<section class="legal-content">
-    <div class="legal-nav">
-        <a href="#" class="legal-nav-item active"><i class="fas fa-file-contract"></i> Conditions</a>
-        <a href="#" class="legal-nav-item"><i class="fas fa-user-shield"></i> Confidentialité</a>
-        <a href="#" class="legal-nav-item"><i class="fas fa-gavel"></i> Mentions légales</a>
-    </div>
+    <section class="legal-nav">
+        <div class="container">
+            <div class="legal-tabs">
+                <button class="legal-tab active" data-section="mentions">
+                    <i class="fas fa-info-circle"></i>
+                    Mentions Légales
+                </button>
+                <button class="legal-tab" data-section="privacy">
+                    <i class="fas fa-shield-alt"></i>
+                    Politique de Confidentialité
+                </button>
+                <button class="legal-tab" data-section="terms">
+                    <i class="fas fa-file-contract"></i>
+                    Conditions d'Utilisation
+                </button>
+                <button class="legal-tab" data-section="cookies">
+                    <i class="fas fa-cookie-bite"></i>
+                    Politique des Cookies
+                </button>
+            </div>
+        </div>
+    </section>
 
-    <div class="legal-sections">
+    <section class="legal-content">
+        <div class="container">
+            <!-- Mentions Légales -->
+            <div id="mentions" class="legal-section active">
+                <div class="legal-document">
+                    <h2><i class="fas fa-info-circle"></i> Mentions Légales</h2>
 
-        <!-- Conditions -->
-        <div class="legal-section active">
-            <div class="legal-card">
-                <div class="card-header">
-                    <h3>Conditions d'utilisation</h3>
+                    <div class="legal-item">
+                        <h3>Éditeur du Site</h3>
+                        <div class="legal-details">
+                            <p><strong>Nom :</strong> YAKO Bot Services</p>
+                            <p><strong>Forme juridique :</strong> SARL</p>
+                            <p><strong>Capital social :</strong> 10 000 €</p>
+                            <p><strong>SIRET :</strong> 123 456 789 00012</p>
+                            <p><strong>RCS :</strong> Paris B 123 456 789</p>
+                            <p><strong>Adresse :</strong> 123 Avenue des Champs-Élysées, 75008 Paris, France</p>
+                            <p><strong>Téléphone :</strong> +33 1 23 45 67 89</p>
+                            <p><strong>Email :</strong> legal@yakobot.com</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Directeur de Publication</h3>
+                        <div class="legal-details">
+                            <p><strong>Nom :</strong> Jean Dupont</p>
+                            <p><strong>Qualité :</strong> Gérant</p>
+                            <p><strong>Email :</strong> direction@yakobot.com</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Hébergement</h3>
+                        <div class="legal-details">
+                            <p><strong>Hébergeur :</strong> OVH SAS</p>
+                            <p><strong>Adresse :</strong> 2 rue Kellermann, 59100 Roubaix, France</p>
+                            <p><strong>Téléphone :</strong> +33 9 72 10 10 07</p>
+                            <p><strong>Site web :</strong> <a href="https://www.ovh.com" target="_blank">www.ovh.com</a></p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Propriété Intellectuelle</h3>
+                        <div class="legal-details">
+                            <p>Ce site et son contenu sont protégés par le droit d'auteur. Toute reproduction ou utilisation non autorisée est strictement interdite.</p>
+                            <p>Les marques, logos et noms de domaine sont la propriété exclusive de YAKO Bot Services.</p>
+                            <p>Le code source du bot Discord YAKO est propriétaire et protégé par le droit d'auteur.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Limitation de Responsabilité</h3>
+                        <div class="legal-details">
+                            <p>YAKO Bot Services ne peut être tenu responsable des dommages directs ou indirects causés par l'utilisation du service.</p>
+                            <p>Le service est fourni "en l'état" sans garantie de fonctionnement continu.</p>
+                            <p>L'utilisateur est seul responsable de l'utilisation qu'il fait du bot sur son serveur Discord.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Droit Applicable</h3>
+                        <div class="legal-details">
+                            <p>Les présentes mentions légales sont soumises au droit français.</p>
+                            <p>Tout litige sera de la compétence exclusive des tribunaux de Paris.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <p>En utilisant le bot YAKO, vous acceptez de respecter les règles de Discord ainsi que nos propres conditions d'utilisation. YAKO est fourni "tel quel" sans garantie. Vous êtes responsables de l’usage du bot sur vos serveurs.</p>
-                    <ul>
-                        <li>Respect des règles Discord</li>
-                        <li>Utilisation non abusive ou malveillante</li>
-                        <li>Interdiction de revente ou distribution non autorisée</li>
-                    </ul>
+            </div>
+
+            <!-- Politique de Confidentialité -->
+            <div id="privacy" class="legal-section">
+                <div class="legal-document">
+                    <h2><i class="fas fa-shield-alt"></i> Politique de Confidentialité</h2>
+
+                    <div class="legal-item">
+                        <h3>Collecte des Données</h3>
+                        <div class="legal-details">
+                            <p>YAKO collecte les données suivantes pour assurer son bon fonctionnement :</p>
+                            <ul>
+                                <li><strong>Données Discord :</strong> ID utilisateur, nom d'utilisateur, avatar, messages (pour la modération)</li>
+                                <li><strong>Données de serveur :</strong> ID du serveur, nom du serveur, paramètres de configuration</li>
+                                <li><strong>Données de navigation :</strong> Adresse IP, navigateur, pages visitées sur notre site</li>
+                                <li><strong>Données de contact :</strong> Email (uniquement si vous nous contactez)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Utilisation des Données</h3>
+                        <div class="legal-details">
+                            <p>Vos données sont utilisées pour :</p>
+                            <ul>
+                                <li>Fournir les services de modération et d'administration</li>
+                                <li>Améliorer les fonctionnalités du bot</li>
+                                <li>Assurer la sécurité et prévenir les abus</li>
+                                <li>Vous contacter en cas de problème technique</li>
+                                <li>Respecter nos obligations légales</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Partage des Données</h3>
+                        <div class="legal-details">
+                            <p>Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf :</p>
+                            <ul>
+                                <li>Avec votre consentement explicite</li>
+                                <li>Pour répondre à une obligation légale</li>
+                                <li>Pour protéger nos droits ou ceux d'autrui</li>
+                                <li>Avec nos prestataires techniques (sous contrat de confidentialité)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Conservation des Données</h3>
+                        <div class="legal-details">
+                            <p>Durées de conservation :</p>
+                            <ul>
+                                <li><strong>Messages modérés :</strong> 30 jours maximum</li>
+                                <li><strong>Logs de sécurité :</strong> 1 an</li>
+                                <li><strong>Paramètres de configuration :</strong> Tant que le bot est présent sur le serveur</li>
+                                <li><strong>Données analytiques :</strong> 2 ans maximum</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Vos Droits RGPD</h3>
+                        <div class="legal-details">
+                            <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                            <ul>
+                                <li><strong>Droit d'accès :</strong> Connaître les données que nous détenons sur vous</li>
+                                <li><strong>Droit de rectification :</strong> Corriger des données inexactes</li>
+                                <li><strong>Droit à l'effacement :</strong> Supprimer vos données ("droit à l'oubli")</li>
+                                <li><strong>Droit de portabilité :</strong> Récupérer vos données dans un format lisible</li>
+                                <li><strong>Droit d'opposition :</strong> Vous opposer au traitement de vos données</li>
+                                <li><strong>Droit à la limitation :</strong> Limiter le traitement de vos données</li>
+                            </ul>
+                            <p>Pour exercer ces droits, contactez-nous à : <strong>privacy@yakobot.com</strong></p>
+                            <p>Vous disposez également du droit d'introduire une réclamation auprès de la CNIL.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Sécurité des Données</h3>
+                        <div class="legal-details">
+                            <p>Nous mettons en place des mesures techniques et organisationnelles pour protéger vos données :</p>
+                            <ul>
+                                <li>Chiffrement SSL/TLS pour toutes les communications</li>
+                                <li>Chiffrement des données sensibles en base</li>
+                                <li>Accès restreint aux données personnelles (principe du moindre privilège)</li>
+                                <li>Surveillance continue de nos systèmes (monitoring 24/7)</li>
+                                <li>Mise à jour régulière de nos mesures de sécurité</li>
+                                <li>Audits de sécurité réguliers</li>
+                                <li>Formation du personnel sur la protection des données</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Transferts de Données</h3>
+                        <div class="legal-details">
+                            <p>Vos données sont principalement traitées au sein de l'Union Européenne.</p>
+                            <p>En cas de transfert vers des pays tiers, nous nous assurons que :</p>
+                            <ul>
+                                <li>Le pays bénéficie d'une décision d'adéquation de la Commission européenne</li>
+                                <li>Ou que des garanties appropriées sont mises en place (clauses contractuelles types)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Contact DPO</h3>
+                        <div class="legal-details">
+                            <p><strong>Délégué à la Protection des Données (DPO) :</strong></p>
+                            <p><strong>Nom :</strong> Marie Martin</p>
+                            <p><strong>Email :</strong> dpo@yakobot.com</p>
+                            <p><strong>Adresse :</strong> YAKO Bot Services - DPO, 123 Avenue des Champs-Élysées, 75008 Paris, France</p>
+                            <p>Le DPO est votre point de contact privilégié pour toute question relative à la protection de vos données personnelles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conditions d'Utilisation -->
+            <div id="terms" class="legal-section">
+                <div class="legal-document">
+                    <h2><i class="fas fa-file-contract"></i> Conditions Générales d'Utilisation</h2>
+
+                    <div class="legal-item">
+                        <h3>Acceptation des Conditions</h3>
+                        <div class="legal-details">
+                            <p>En utilisant YAKO Bot, vous acceptez pleinement et sans réserve les présentes conditions générales d'utilisation.</p>
+                            <p>Si vous n'acceptez pas ces conditions, vous devez cesser immédiatement l'utilisation du service.</p>
+                            <p>L'utilisation du service vaut acceptation des présentes conditions.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Description du Service</h3>
+                        <div class="legal-details">
+                            <p>YAKO est un bot Discord proposant des fonctionnalités d'administration et de modération pour serveurs Discord.</p>
+                            <p>Le service comprend notamment :</p>
+                            <ul>
+                                <li>Modération automatique et manuelle</li>
+                                <li>Gestion des rôles et permissions</li>
+                                <li>Système de niveaux et récompenses</li>
+                                <li>Lecteur de musique intégré</li>
+                                <li>Outils d'administration avancés</li>
+                                <li>Système de logs et d'audit</li>
+                            </ul>
+                            <p>Le service est proposé gratuitement avec des fonctionnalités de base, et peut inclure des options premium.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Conditions d'Accès</h3>
+                        <div class="legal-details">
+                            <p>Pour utiliser YAKO, vous devez :</p>
+                            <ul>
+                                <li>Avoir un compte Discord valide et en règle</li>
+                                <li>Être propriétaire ou avoir les permissions d'administration du serveur</li>
+                                <li>Respecter les conditions d'utilisation de Discord</li>
+                                <li>Être âgé de 13 ans minimum (conformément aux ToS Discord)</li>
+                                <li>Avoir la capacité juridique pour contracter</li>
+                                <li>Ne pas être sous le coup d'une interdiction d'utilisation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Utilisation Acceptable</h3>
+                        <div class="legal-details">
+                            <p>Il est strictement interdit d'utiliser YAKO pour :</p>
+                            <ul>
+                                <li>Violer les lois en vigueur dans votre juridiction</li>
+                                <li>Harceler, menacer ou intimider d'autres utilisateurs</li>
+                                <li>Diffuser du contenu illégal, haineux, discriminatoire ou pornographique</li>
+                                <li>Contourner les mesures de sécurité ou tenter de compromettre le service</li>
+                                <li>Utiliser le bot à des fins de spam ou de publicité non sollicitée</li>
+                                <li>Collecter des données d'utilisateurs sans leur consentement</li>
+                                <li>Créer de faux comptes ou usurper l'identité d'autrui</li>
+                                <li>Distribuer des virus, malwares ou tout code malveillant</li>
+                                <li>Utiliser le service à des fins commerciales sans autorisation</li>
+                                <li>Revendre, louer ou redistribuer l'accès au service</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Disponibilité du Service</h3>
+                        <div class="legal-details">
+                            <p>Nous nous efforçons de maintenir YAKO disponible 24h/24 et 7j/7, mais ne garantissons pas une disponibilité absolue.</p>
+                            <p>Des interruptions peuvent survenir pour :</p>
+                            <ul>
+                                <li>Maintenance programmée (avec préavis de 24h minimum)</li>
+                                <li>Maintenance d'urgence (sécurité, bugs critiques)</li>
+                                <li>Problèmes techniques indépendants de notre volonté</li>
+                                <li>Mise à jour du service et ajout de nouvelles fonctionnalités</li>
+                                <li>Surcharge des serveurs Discord</li>
+                                <li>Problèmes d'infrastructure (hébergement, réseau)</li>
+                            </ul>
+                            <p>Nous visons un taux de disponibilité de 99,5% sur une base mensuelle.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Limitation de Responsabilité</h3>
+                        <div class="legal-details">
+                            <p>YAKO Bot Services décline toute responsabilité en cas de :</p>
+                            <ul>
+                                <li>Dommages directs ou indirects liés à l'utilisation du service</li>
+                                <li>Perte de données due à des défaillances techniques</li>
+                                <li>Actions de modération automatiques erronées</li>
+                                <li>Conflits entre utilisateurs de votre serveur</li>
+                                <li>Utilisation malveillante du bot par des tiers</li>
+                                <li>Incompatibilité avec d'autres bots ou services</li>
+                                <li>Pertes financières ou commerciales</li>
+                                <li>Atteinte à la réputation</li>
+                            </ul>
+                            <p>Notre responsabilité est limitée au montant payé pour l'utilisation du service au cours des 12 derniers mois.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Suspension et Résiliation</h3>
+                        <div class="legal-details">
+                            <p>Nous nous réservons le droit de suspendre ou résilier l'accès au service en cas de :</p>
+                            <ul>
+                                <li>Violation des présentes conditions d'utilisation</li>
+                                <li>Utilisation abusive du service</li>
+                                <li>Non-respect des lois en vigueur</li>
+                                <li>Comportement nuisant à d'autres utilisateurs</li>
+                                <li>Tentative de piratage ou d'intrusion</li>
+                                <li>Non-paiement des services premium</li>
+                                <li>Inactivité prolongée (plus de 6 mois)</li>
+                            </ul>
+                            <p>La suspension peut être temporaire ou définitive selon la gravité des faits.</p>
+                            <p>En cas de résiliation, vous disposez de 30 jours pour récupérer vos données.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Propriété Intellectuelle</h3>
+                        <div class="legal-details">
+                            <p>YAKO Bot, son code source, sa documentation et tous les éléments qui le composent sont la propriété exclusive de YAKO Bot Services.</p>
+                            <p>Vous ne pouvez pas :</p>
+                            <ul>
+                                <li>Copier, modifier ou distribuer le code du bot</li>
+                                <li>Effectuer de l'ingénierie inverse</li>
+                                <li>Créer des œuvres dérivées</li>
+                                <li>Utiliser nos marques sans autorisation</li>
+                            </ul>
+                            <p>Vous conservez la propriété du contenu que vous publiez via le bot.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Modification des Conditions</h3>
+                        <div class="legal-details">
+                            <p>Nous nous réservons le droit de modifier ces conditions d'utilisation à tout moment.</p>
+                            <p>Les modifications prennent effet dès leur publication sur cette page.</p>
+                            <p>Les modifications majeures vous seront notifiées par email ou via Discord.</p>
+                            <p>Il est de votre responsabilité de consulter régulièrement ces conditions.</p>
+                            <p>L'utilisation continue du service après modification vaut acceptation des nouvelles conditions.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Droit Applicable et Juridiction</h3>
+                        <div class="legal-details">
+                            <p>Les présentes conditions sont régies par le droit français.</p>
+                            <p>Tout litige sera de la compétence exclusive des tribunaux de Paris.</p>
+                            <p>En cas de nullité d'une clause, les autres dispositions restent applicables.</p>
+                            <p>Les parties s'efforceront de résoudre tout différend à l'amiable avant toute action judiciaire.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Contact</h3>
+                        <div class="legal-details">
+                            <p>Pour toute question relative aux présentes conditions :</p>
+                            <p><strong>Email :</strong> legal@yakobot.com</p>
+                            <p><strong>Adresse :</strong> YAKO Bot Services, 123 Avenue des Champs-Élysées, 75008 Paris, France</p>
+                            <p><strong>Téléphone :</strong> +33 1 23 45 67 89 (du lundi au vendredi, 9h-18h)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Politique des Cookies -->
+            <div id="cookies" class="legal-section">
+                <div class="legal-document">
+                    <h2><i class="fas fa-cookie-bite"></i> Politique des Cookies</h2>
+
+                    <div class="legal-item">
+                        <h3>Qu'est-ce qu'un Cookie ?</h3>
+                        <div class="legal-details">
+                            <p>Un cookie est un petit fichier texte stocké sur votre appareil lorsque vous visitez notre site web.</p>
+                            <p>Les cookies nous permettent de reconnaître votre navigateur et de mémoriser certaines informations.</p>
+                            <p>Ils améliorent votre expérience de navigation et nous aident à comprendre comment notre site est utilisé.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Types de Cookies Utilisés</h3>
+                        <div class="legal-details">
+                            <div class="cookie-category">
+                                <h4><i class="fas fa-cog"></i> Cookies Techniques (Nécessaires)</h4>
+                                <p>Ces cookies sont indispensables au bon fonctionnement du site :</p>
+                                <ul>
+                                    <li><strong>Session utilisateur :</strong> Maintien de votre session de navigation</li>
+                                    <li><strong>Préférences :</strong> Sauvegarde de vos préférences (langue, thème)</li>
+                                    <li><strong>Sécurité :</strong> Protection contre les attaques CSRF</li>
+                                    <li><strong>Load balancing :</strong> Répartition de charge entre serveurs</li>
+                                </ul>
+                                <p><em>Durée de conservation : Session ou 1 an maximum</em></p>
+                                <p><em>Base légale : Intérêt légitime (fonctionnement du site)</em></p>
+                            </div>
+
+                            <div class="cookie-category">
+                                <h4><i class="fas fa-chart-line"></i> Cookies Analytiques</h4>
+                                <p>Ces cookies nous aident à comprendre comment vous utilisez notre site :</p>
+                                <ul>
+                                    <li><strong>Google Analytics :</strong> Statistiques de fréquentation anonymisées</li>
+                                    <li><strong>Pages populaires :</strong> Identification du contenu le plus consulté</li>
+                                    <li><strong>Parcours utilisateur :</strong> Analyse du comportement de navigation</li>
+                                    <li><strong>Temps de session :</strong> Durée moyenne des visites</li>
+                                    <li><strong>Taux de rebond :</strong> Pourcentage de visiteurs quittant rapidement</li>
+                                </ul>
+                                <p><em>Durée de conservation : 2 ans maximum</em></p>
+                                <p><em>Base légale : Consentement</em></p>
+                            </div>
+
+                            <div class="cookie-category">
+                                <h4><i class="fas fa-bullseye"></i> Cookies de Performance</h4>
+                                <p>Ces cookies améliorent les performances de notre site :</p>
+                                <ul>
+                                    <li><strong>Cache :</strong> Optimisation du temps de chargement</li>
+                                    <li><strong>CDN :</strong> Distribution optimisée du contenu</li>
+                                    <li><strong>Compression :</strong> Réduction de la taille des fichiers</li>
+                                    <li><strong>Lazy loading :</strong> Chargement différé des images</li>
+                                </ul>
+                                <p><em>Durée de conservation : 1 an maximum</em></p>
+                                <p><em>Base légale : Consentement</em></p>
+                            </div>
+
+                            <div class="cookie-category">
+                                <h4><i class="fas fa-heart"></i> Cookies de Préférences</h4>
+                                <p>Ces cookies mémorisent vos choix pour personnaliser votre expérience :</p>
+                                <ul>
+                                    <li><strong>Thème :</strong> Mode sombre/clair</li>
+                                    <li><strong>Langue :</strong> Choix de la langue d'affichage</li>
+                                    <li><strong>Région :</strong> Contenu géolocalisé</li>
+                                    <li><strong>Accessibilité :</strong> Options d'accessibilité activées</li>
+                                </ul>
+                                <p><em>Durée de conservation : 1 an maximum</em></p>
+                                <p><em>Base légale : Consentement</em></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Gestion de vos Préférences</h3>
+                        <div class="legal-details">
+                            <p>Vous pouvez gérer vos préférences de cookies de plusieurs façons :</p>
+
+                            <div class="cookie-controls">
+                                <h4>Via notre Interface</h4>
+                                <div class="cookie-preferences">
+                                    <div class="cookie-toggle">
+                                        <label>
+                                            <input type="checkbox" checked disabled>
+                                            <span class="toggle-slider"></span>
+                                            Cookies Techniques (Obligatoires)
+                                        </label>
+                                    </div>
+                                    <div class="cookie-toggle">
+                                        <label>
+                                            <input type="checkbox" id="analytics-cookies">
+                                            <span class="toggle-slider"></span>
+                                            Cookies Analytiques
+                                        </label>
+                                    </div>
+                                    <div class="cookie-toggle">
+                                        <label>
+                                            <input type="checkbox" id="performance-cookies">
+                                            <span class="toggle-slider"></span>
+                                            Cookies de Performance
+                                        </label>
+                                    </div>
+                                    <div class="cookie-toggle">
+                                        <label>
+                                            <input type="checkbox" id="preferences-cookies">
+                                            <span class="toggle-slider"></span>
+                                            Cookies de Préférences
+                                        </label>
+                                    </div>
+                                </div>
+                                <button id="save-cookie-preferences" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Sauvegarder mes préférences
+                                </button>
+                                <button id="reset-cookie-preferences" class="btn btn-outline">
+                                    <i class="fas fa-undo"></i>
+                                    Réinitialiser
+                                </button>
+                            </div>
+
+                            <h4>Via votre Navigateur</h4>
+                            <p>Vous pouvez également configurer votre navigateur pour :</p>
+                            <ul>
+                                <li>Bloquer tous les cookies</li>
+                                <li>Accepter uniquement les cookies de première partie</li>
+                                <li>Supprimer les cookies à la fermeture du navigateur</li>
+                                <li>Être notifié avant l'installation d'un cookie</li>
+                                <li>Gérer les cookies site par site</li>
+                            </ul>
+
+                            <div class="browser-instructions">
+                                <details>
+                                    <summary><i class="fab fa-chrome"></i> Google Chrome</summary>
+                                    <p>Paramètres → Confidentialité et sécurité → Cookies et autres données de sites → Gérer les cookies et les données de sites</p>
+                                </details>
+                                <details>
+                                    <summary><i class="fab fa-firefox"></i> Mozilla Firefox</summary>
+                                    <p>Paramètres → Vie privée et sécurité → Cookies et données de sites → Gérer les données</p>
+                                </details>
+                                <details>
+                                    <summary><i class="fab fa-safari"></i> Safari</summary>
+                                    <p>Préférences → Confidentialité → Cookies et données de sites web → Gérer les données de sites web</p>
+                                </details>
+                                <details>
+                                    <summary><i class="fab fa-edge"></i> Microsoft Edge</summary>
+                                    <p>Paramètres → Cookies et autorisations de site → Cookies et données stockées → Gérer et supprimer</p>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Cookies Tiers</h3>
+                        <div class="legal-details">
+                            <p>Notre site peut contenir des cookies provenant de services tiers :</p>
+                            <ul>
+                                <li><strong>Google Analytics :</strong> Analyse d'audience (google.com)</li>
+                                <li><strong>Google Fonts :</strong> Polices web (fonts.googleapis.com)</li>
+                                <li><strong>Cloudflare :</strong> Protection et performance (cloudflare.com)</li>
+                                <li><strong>Discord :</strong> Intégration widget Discord (discord.com)</li>
+                                <li><strong>YouTube :</strong> Vidéos intégrées (youtube.com)</li>
+                                <li><strong>Font Awesome :</strong> Icônes (fontawesome.com)</li>
+                            </ul>
+                            <p>Ces services ont leurs propres politiques de cookies que nous vous encourageons à consulter :</p>
+                            <ul>
+                                <li><a href="https://policies.google.com/privacy" target="_blank">Politique de Google</a></li>
+                                <li><a href="https://www.cloudflare.com/privacypolicy/" target="_blank">Politique de Cloudflare</a></li>
+                                <li><a href="https://discord.com/privacy" target="_blank">Politique de Discord</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Cookies et Réseaux Sociaux</h3>
+                        <div class="legal-details">
+                            <p>Notre site peut intégrer des boutons de partage vers les réseaux sociaux :</p>
+                            <ul>
+                                <li><strong>Twitter :</strong> Boutons de partage et widgets</li>
+                                <li><strong>Facebook :</strong> Boutons "J'aime" et partage</li>
+                                <li><strong>LinkedIn :</strong> Boutons de partage professionnel</li>
+                                <li><strong>GitHub :</strong> Liens vers nos repositories</li>
+                            </ul>
+                            <p>Ces boutons peuvent déposer des cookies même si vous ne cliquez pas dessus.</p>
+                            <p>Ils permettent aux réseaux sociaux de suivre votre navigation pour leurs propres besoins.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Conséquences du Refus</h3>
+                        <div class="legal-details">
+                            <p>Le refus de certains cookies peut impacter votre expérience :</p>
+                            <ul>
+                                <li><strong>Cookies techniques :</strong>
+                                    <ul>
+                                        <li>Fonctionnement altéré du site</li>
+                                        <li>Impossibilité de se connecter</li>
+                                        <li>Perte des préférences à chaque visite</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Cookies analytiques :</strong>
+                                    <ul>
+                                        <li>Amélioration du service limitée</li>
+                                        <li>Moins de personnalisation</li>
+                                        <li>Contenu moins pertinent</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Cookies de performance :</strong>
+                                    <ul>
+                                        <li>Chargement plus lent des pages</li>
+                                        <li>Expérience utilisateur dégradée</li>
+                                        <li>Consommation de bande passante plus élevée</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Cookies de préférences :</strong>
+                                    <ul>
+                                        <li>Réinitialisation du thème à chaque visite</li>
+                                        <li>Langue par défaut uniquement</li>
+                                        <li>Perte des paramètres d'accessibilité</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Durées de Conservation</h3>
+                        <div class="legal-details">
+                            <p>Les cookies ont des durées de vie différentes selon leur utilité :</p>
+                            <ul>
+                                <li><strong>Cookies de session :</strong> Supprimés à la fermeture du navigateur</li>
+                                <li><strong>Cookies persistants :</strong> Conservés pour une durée déterminée :
+                                    <ul>
+                                        <li>Préférences utilisateur : 1 an</li>
+                                        <li>Données analytiques : 2 ans maximum</li>
+                                        <li>Performance et cache : 1 an</li>
+                                        <li>Sécurité : Variable selon le besoin</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p>Vous pouvez supprimer manuellement tous les cookies à tout moment via votre navigateur.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Cookies et Données Personnelles</h3>
+                        <div class="legal-details">
+                            <p>Certains cookies peuvent contenir des données personnelles :</p>
+                            <ul>
+                                <li><strong>Identifiants de session :</strong> Permettent de vous reconnaître</li>
+                                <li><strong>Préférences :</strong> Sauvegardent vos choix personnels</li>
+                                <li><strong>Données d'authentification :</strong> Maintiennent votre connexion</li>
+                            </ul>
+                            <p>Ces données sont traitées conformément à notre <a href="#privacy">Politique de Confidentialité</a>.</p>
+                            <p>Vous disposez des mêmes droits (accès, rectification, suppression) sur ces données.</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Mise à Jour de la Politique</h3>
+                        <div class="legal-details">
+                            <p>Cette politique de cookies peut être mise à jour pour refléter :</p>
+                            <ul>
+                                <li>L'évolution de nos services et fonctionnalités</li>
+                                <li>Les changements réglementaires</li>
+                                <li>L'intégration de nouveaux partenaires</li>
+                                <li>L'amélioration de notre site web</li>
+                            </ul>
+                            <p>Nous vous informerons de tout changement significatif par :</p>
+                            <ul>
+                                <li>Une bannière sur notre site web</li>
+                                <li>Un email aux utilisateurs enregistrés</li>
+                                <li>Une notification Discord</li>
+                            </ul>
+                            <p><strong>Dernière mise à jour :</strong> 11 juillet 2025</p>
+                        </div>
+                    </div>
+
+                    <div class="legal-item">
+                        <h3>Contact et Questions</h3>
+                        <div class="legal-details">
+                            <p>Pour toute question concernant notre utilisation des cookies :</p>
+                            <p><strong>Email :</strong> cookies@yakobot.com</p>
+                            <p><strong>Adresse :</strong> YAKO Bot Services - Service Cookies, 123 Avenue des Champs-Élysées, 75008 Paris, France</p>
+                            <p><strong>Téléphone :</strong> +33 1 23 45 67 89</p>
+                            <p><strong>Horaires :</strong> Du lundi au vendredi, 9h-18h (hors jours fériés)</p>
+
+                            <p>Vous pouvez également :</p>
+                            <ul>
+                                <li>Consulter notre <a href="#faq">FAQ sur les cookies</a></li>
+                                <li>Contacter notre <a href="#privacy">DPO</a> pour les questions de confidentialité</li>
+                                <li>Nous rejoindre sur <a href="#">Discord</a> pour un support communautaire</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Confidentialité -->
-        <div class="legal-section">
-            <div class="legal-card">
-                <div class="card-header">
-                    <h3>Politique de confidentialité</h3>
+    <section class="legal-summary">
+        <div class="container">
+            <h2><i class="fas fa-handshake"></i> En Résumé</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Vos Données Protégées</h3>
+                    <p>Nous prenons la protection de vos données personnelles au sérieux et respectons strictement le RGPD et les lois en vigueur.</p>
                 </div>
-                <div class="card-content">
-                    <p>Nous nous engageons à protéger vos données. Aucune information personnelle n'est collectée sans votre consentement. Les logs sont temporaires et utilisés uniquement à des fins de diagnostic.</p>
-                    <ul>
-                        <li>Aucune collecte de messages</li>
-                        <li>Données chiffrées et stockées temporairement</li>
-                        <li>Respect du RGPD</li>
-                    </ul>
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Utilisation Responsable</h3>
+                    <p>YAKO doit être utilisé dans le respect des lois, des conditions d'utilisation de Discord et du bien-être de la communauté.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>Droits et Devoirs</h3>
+                    <p>Vous avez des droits concernant vos données personnelles et des obligations dans l'utilisation éthique du service.</p>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Contact Facile</h3>
+                    <p>Notre équipe légale et notre DPO sont disponibles pour répondre à toutes vos questions juridiques et de confidentialité.</p>
                 </div>
             </div>
-        </div>
-
-        <!-- Mentions légales -->
-        <div class="legal-section">
-            <div class="legal-card">
-                <div class="card-header">
-                    <h3>Mentions légales</h3>
-                </div>
-                <div class="card-content">
-                    <p>Ce site et le bot YAKO sont édités par l'équipe de développement YAKO. Pour toute question ou réclamation, veuillez nous contacter via le support.</p>
-                    <ul>
-                        <li>Éditeur : Équipe YAKO</li>
-                        <li>Contact : support@yako-bot.com</li>
-                        <li>Hébergeur : GitHub Pages</li>
-                    </ul>
-                </div>
+            <div class="summary-contact">
+                <p>Une question juridique ? Contactez-nous à <a href="mailto:legal@yakobot.com">legal@yakobot.com</a></p>
+                <p>Question sur vos données ? Écrivez à notre DPO : <a href="mailto:dpo@yakobot.com">dpo@yakobot.com</a></p>
             </div>
         </div>
+    </section>
+</main>
 
-    </div>
-</section>
-
-<!-- Footer -->
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
-            <div class="footer-logo">
-                <i class="fas fa-robot"></i>
-                <span>YAKO</span>
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <i class="fas fa-robot"></i>
+                    <span>YAKO</span>
+                </div>
+                <p>Le bot Discord de référence pour l'administration de serveurs.</p>
+                <p><small>Conforme RGPD • Hébergé en France • Support 24/7</small></p>
             </div>
-            <div class="footer-links">
-                <a href="../index.html">Accueil</a>
-                <a href="../index.html#features">Fonctionnalités</a>
-                <a href="../index.html#commands">Commandes</a>
-                <a href="./support.html">Support</a>
-                <a href="./legal.html">Légal</a>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="fonctionnalites.html">Fonctionnalités</a></li>
+                    <li><a href="support.html">Support & FAQ</a></li>
+                    <li><a href="#mentions">Mentions légales</a></li>
+                </ul>
             </div>
-            <div class="footer-social">
-                <a href="https://discord.gg/yako" target="_blank"><i class="fab fa-discord"></i></a>
-                <a href="https://github.com/yako-bot" target="_blank"><i class="fab fa-github"></i></a>
-                <a href="https://twitter.com/yako_bot" target="_blank"><i class="fab fa-twitter"></i></a>
+            <div class="footer-section">
+                <h4>Contact Légal</h4>
+                <ul>
+                    <li><a href="mailto:legal@yakobot.com">Service Juridique</a></li>
+                    <li><a href="mailto:dpo@yakobot.com">Délégué DPO</a></li>
+                    <li><a href="mailto:cookies@yakobot.com">Questions Cookies</a></li>
+                    <li><a href="tel:+33123456789">+33 1 23 45 67 89</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#" title="Discord"><i class="fab fa-discord"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+                <p><small>Réseaux sociaux officiels</small></p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 YAKO Bot. Tous droits réservés.</p>
+            <p>&copy; 2025 YAKO Bot Services. Tous droits réservés. | SIRET: 123 456 789 00012</p>
+            <div class="footer-legal-links">
+                <a href="#mentions">Mentions légales</a>
+                <a href="#privacy">Confidentialité</a>
+                <a href="#terms">CGU</a>
+                <a href="#cookies">Cookies</a>
+            </div>
         </div>
     </div>
 </footer>
 
-<script src="./js/legal.js"></script>
+<script src="js/legal.js"></script>
 </body>
 </html>
