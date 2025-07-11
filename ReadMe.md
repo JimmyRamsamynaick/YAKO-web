@@ -25,7 +25,7 @@ YAKO est le bot d’administration Discord conçu pour vous offrir **puissance**
 
 ## 🔍 Démo en ligne
 
-> 🌐  https://votre-site-de-demo.com
+> 🌐  https://jimmyramsamynaick.github.io/YAKO-web/index.html
 >
 > *Découvrez immédiatement le design animé, le menu sticky, le mockup Discord et les CTA intégrés.*
 
@@ -81,7 +81,6 @@ YAKO est le bot d’administration Discord conçu pour vous offrir **puissance**
 │   └── style.css       # Variables + styles globaux et composants
 ├── js/
 │   └── script.js       # Menu hamburger, scroll effects, clipboard
-├── assets/             # Images, logos, icônes personnalisées
 ├── LICENSE             # Licence open-source MIT
 └── README.md           # Documentation projet
 ```
