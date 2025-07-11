@@ -89,7 +89,7 @@ YAKO est le bot d’administration Discord conçu pour vous offrir **puissance**
 💻 Installation & Usage
 Cloner le dépôt
 bash
-git clone https://github.com/votre-utilisateur/yako-landing.git
+git clone https://github.com/JimmyRamsamynaick/YAKO-web.git
 cd yako-landing
 Ouvrir la page
 Double-cliquez sur index.html
