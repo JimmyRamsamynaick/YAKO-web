@@ -619,6 +619,58 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification(helpHTML, 'info', 8000);
     }
 
+    // ========== REDIRECTION VERS LE CONFIGURATEUR ==========
+    function initConfiguratorRedirect() {
+        // Sélectionner le bouton du configurateur
+        const configuratorButton = document.querySelector('.btn-configurator');
+
+        if (configuratorButton) {
+            // Remplacer le comportement du bouton
+            configuratorButton.disabled = false;
+            configuratorButton.classList.remove('disabled');
+            configuratorButton.innerHTML = `
+                <i class="fas fa-wrench"></i>
+                Accéder au Configurateur
+            `;
+
+            // Ajouter l'événement de clic
+            configuratorButton.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Animation de clic
+                configuratorButton.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    configuratorButton.style.transform = 'scale(1)';
+                }, 150);
+
+                // Notification de redirection
+                showNotification('🔧 Redirection vers le configurateur...', 'info', 2000);
+
+                // Redirection avec délai pour l'animation
+                setTimeout(() => {
+                    window.location.href = 'configurator.html';
+                }, 300);
+
+                console.log('🔧 Redirection vers le configurateur');
+            });
+
+            // Effets hover
+            configuratorButton.addEventListener('mouseenter', () => {
+                configuratorButton.style.background = 'linear-gradient(135deg, #5a6fd8, #6d28d9)';
+                configuratorButton.style.transform = 'translateY(-2px)';
+                configuratorButton.style.boxShadow = '0 10px 20px rgba(102, 126, 234, 0.3)';
+            });
+
+            configuratorButton.addEventListener('mouseleave', () => {
+                configuratorButton.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                configuratorButton.style.transform = 'translateY(0)';
+                configuratorButton.style.boxShadow = 'none';
+            });
+
+            console.log('✅ Redirection vers le configurateur initialisée');
+        }
+    }
+
     // ========== FONCTIONS UTILITAIRES ==========
     function isDarkMode() {
         return document.body.classList.contains('dark-mode');
@@ -626,11 +678,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showNotification(message, type = 'success', duration = 4000) {
         // Utiliser la fonction du script principal si disponible
-        if (window.yakoUtils && window.yakoUtils.showNotification) {
-            return window.yakoUtils.showNotification(message, type, duration);
+        if (window.yakoGlobalDarkMode && window.yakoGlobalDarkMode.showNotification) {
+            return window.yakoGlobalDarkMode.showNotification(message, type, duration);
         }
 
-        // Fallback si la fonction principale n'est pas disponible
+        // Fallback uniforme si la fonction principale n'est pas disponible
+        // Supprimer les notifications existantes
+        document.querySelectorAll('.notification, .yako-notification').forEach(notif => notif.remove());
+
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
 
@@ -641,12 +696,6 @@ document.addEventListener('DOMContentLoaded', function() {
             info: 'fa-info-circle'
         };
 
-        notification.innerHTML = `
-            <i class="fas ${icons[type] || icons.info}"></i>
-            <span>${message}</span>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; cursor: pointer; font-size: 1.2rem; margin-left: auto;">×</button>
-        `;
-
         const colors = {
             success: '#10b981',
             error: '#ef4444',
@@ -654,37 +703,83 @@ document.addEventListener('DOMContentLoaded', function() {
             info: '#3b82f6'
         };
 
+        notification.innerHTML = `
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <i class="fas ${icons[type] || icons.info}" style="font-size: 1.1rem; margin-top: 2px; flex-shrink: 0;"></i>
+                <div style="flex: 1; line-height: 1.4;">${message}</div>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; color: inherit; cursor: pointer; font-size: 1.2rem; margin-left: 10px; opacity: 0.7; flex-shrink: 0; padding: 0; line-height: 1;"
+                        aria-label="Fermer la notification">
+                    ×
+                </button>
+            </div>
+        `;
+
+        const isDarkModeActive = document.body.classList.contains('dark-mode');
+
         notification.style.cssText = `
             position: fixed;
-            top: 20px;
+            bottom: 100px;
             right: 20px;
-            max-width: 400px;
-            padding: 15px 20px;
-            background: ${colors[type]};
-            color: white;
-            border-radius: 10px;
+            background: ${isDarkModeActive ? '#1e293b' : 'white'};
+            color: ${isDarkModeActive ? '#e2e8f0' : colors[type]};
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 4px solid ${colors[type]};
+            border: 1px solid ${isDarkModeActive ? colors[type] : 'rgba(0, 0, 0, 0.1)'};
             font-weight: 500;
             z-index: 10000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
+            animation: slideInFromBottom 0.3s ease;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            max-width: 380px;
+            min-width: 300px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
         `;
+
+        // Ajouter l'animation CSS si elle n'existe pas
+        if (!document.querySelector('#notification-animations')) {
+            const style = document.createElement('style');
+            style.id = 'notification-animations';
+            style.textContent = `
+                @keyframes slideInFromBottom {
+                    from { transform: translateY(100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes slideOutToBottom {
+                    from { transform: translateY(0); opacity: 1; }
+                    to { transform: translateY(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
 
         document.body.appendChild(notification);
 
+        // Auto-suppression
         if (duration > 0) {
             setTimeout(() => {
                 if (notification && notification.parentNode) {
-                    notification.remove();
+                    notification.style.animation = 'slideOutToBottom 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
                 }
             }, duration);
         }
 
-        notification.addEventListener('click', () => {
-            notification.remove();
+        // Fermer au clic
+        notification.addEventListener('click', (e) => {
+            if (e.target === notification || e.target.closest('button')) {
+                notification.style.animation = 'slideOutToBottom 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
         });
     }
 
@@ -711,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initTypewriterEffect();
         initStateManagement();
         initKeyboardShortcuts();
+        initConfiguratorRedirect();
 
         console.log('✅ YAKO Fonctionnalités - Toutes les fonctionnalités initialisées');
 
@@ -735,6 +831,17 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('unhandledrejection', function(e) {
         console.error('Promise rejetée sur fonctionnalités:', e.reason);
     });
+
+    // Exposer les fonctions utiles globalement
+    window.yakoFonctionnalites = {
+        clearSearch: () => clearSearch(),
+        switchTab: (tab) => {
+            const tabButton = document.querySelector(`[data-tab="${tab}"]`);
+            if (tabButton) tabButton.click();
+        },
+        getCurrentTab: () => currentTab,
+        getSearchResults: () => searchResults
+    };
 });
 
 // ========== STYLES DYNAMIQUES POUR LES ANIMATIONS ==========
@@ -836,308 +943,30 @@ functionalitiesStyles.textContent = `
     .command-item code:hover::after {
         animation: fadeIn 0.3s ease;
     }
+
+    /* Amélioration du focus pour l'accessibilité */
+    kbd {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        color: #334155;
+        display: inline-block;
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+        font-size: 0.85em;
+        font-weight: 700;
+        line-height: 1;
+        padding: 2px 4px;
+        white-space: nowrap;
+    }
+    
+    body.dark-mode kbd {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #e5e7eb;
+    }
 `;
 
 document.head.appendChild(functionalitiesStyles);
 
-// Exposer les fonctions utiles globalement
-window.yakoFonctionnalites = {
-    clearSearch: () => clearSearch(),
-    switchTab: (tab) => {
-        const tabButton = document.querySelector(`[data-tab="${tab}"]`);
-        if (tabButton) tabButton.click();
-    },
-    getCurrentTab: () => currentTab,
-    getSearchResults: () => searchResults
-};
-
-// Ajout à fonctionnalites.js pour la redirection vers le configurateur
-
-// ========== REDIRECTION VERS LE CONFIGURATEUR ==========
-function initConfiguratorRedirect() {
-    // Sélectionner le bouton du configurateur
-    const configuratorButton = document.querySelector('.btn-configurator');
-
-    if (configuratorButton) {
-        // Remplacer le comportement du bouton
-        configuratorButton.disabled = false;
-        configuratorButton.classList.remove('disabled');
-        configuratorButton.innerHTML = `
-            <i class="fas fa-wrench"></i>
-            Accéder au Configurateur
-        `;
-
-        // Styles actifs
-        configuratorButton.style.cssText = `
-            width: 100%;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 0 0 20px 20px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        `;
-
-        // Ajouter l'événement de clic
-        configuratorButton.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            // Animation de clic
-            configuratorButton.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                configuratorButton.style.transform = 'scale(1)';
-            }, 150);
-
-            // Notification de redirection
-            if (window.yakoUtils && window.yakoUtils.showNotification) {
-                window.yakoUtils.showNotification('🔧 Redirection vers le configurateur...', 'info', 2000);
-            }
-
-            // Redirection avec délai pour l'animation
-            setTimeout(() => {
-                window.location.href = 'configurator.html';
-            }, 300);
-
-            console.log('🔧 Redirection vers le configurateur');
-        });
-
-        // Effets hover
-        configuratorButton.addEventListener('mouseenter', () => {
-            configuratorButton.style.background = 'linear-gradient(135deg, #5a6fd8, #6d28d9)';
-            configuratorButton.style.transform = 'translateY(-2px)';
-            configuratorButton.style.boxShadow = '0 10px 20px rgba(102, 126, 234, 0.3)';
-        });
-
-        configuratorButton.addEventListener('mouseleave', () => {
-            configuratorButton.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-            configuratorButton.style.transform = 'translateY(0)';
-            configuratorButton.style.boxShadow = 'none';
-        });
-
-        // Mettre à jour le texte de maintenance
-        const maintenanceNotice = document.querySelector('.maintenance-notice');
-        if (maintenanceNotice) {
-            const noticeText = maintenanceNotice.querySelector('p');
-            if (noticeText) {
-                noticeText.innerHTML = `
-                    Cette fonctionnalité est actuellement en cours de développement. 
-                    <strong>Vous pouvez accéder à la version de prévisualisation</strong> pour voir à quoi elle ressemblera !
-                `;
-            }
-
-            // Changer l'icône pour indiquer que c'est accessible
-            const noticeIcon = maintenanceNotice.querySelector('i');
-            if (noticeIcon) {
-                noticeIcon.className = 'fas fa-rocket';
-            }
-
-            // Changer les couleurs pour indiquer que c'est accessible
-            maintenanceNotice.style.background = 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)';
-            if (document.body.classList.contains('dark-mode')) {
-                maintenanceNotice.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)';
-            }
-        }
-
-        console.log('✅ Redirection vers le configurateur initialisée');
-    }
-}
-
-// ========== INTÉGRATION COMPLÈTE DANS FONCTIONNALITES.JS ==========
-// Voici comment modifier le fichier fonctionnalites.js existant :
-
-/*
-// MODIFIER LA SECTION D'INITIALISATION DANS fonctionnalites.js :
-
-// À la fin de la fonction d'initialisation principale, ajouter :
-try {
-    initTabs();
-    initFeatureSearch();
-    initCommandCopy();
-    initScrollAnimations();
-    initTypewriterEffect();
-    initStateManagement();
-    initKeyboardShortcuts();
-    initConfiguratorRedirect(); // <-- AJOUTER CETTE LIGNE
-
-    console.log('✅ YAKO Fonctionnalités - Toutes les fonctionnalités initialisées');
-
-    // Notification de bienvenue (seulement la première fois)
-    if (!localStorage.getItem('fonctionnalitesVisited')) {
-        setTimeout(() => {
-            showNotification('Bienvenue sur la page des fonctionnalités ! Tapez H pour voir les raccourcis.', 'info', 5000);
-            localStorage.setItem('fonctionnalitesVisited', 'true');
-        }, 1000);
-    }
-
-} catch (error) {
-    console.error('❌ Erreur lors de l\'initialisation:', error);
-    showNotification('Une erreur est survenue lors du chargement de la page.', 'error');
-}
-*/
-
-// ========== MISE À JOUR DU CSS POUR LE CONFIGURATEUR ==========
-function updateConfiguratorStyles() {
-    // Ajouter des styles supplémentaires pour le bouton actif
-    const style = document.createElement('style');
-    style.id = 'configurator-active-styles';
-    style.textContent = `
-        /* Styles pour le bouton configurateur actif */
-        .btn-configurator:not(.disabled) {
-            background: linear-gradient(135deg, #667eea, #764ba2) !important;
-            color: white !important;
-            cursor: pointer !important;
-            opacity: 1 !important;
-            transform: none !important;
-        }
-        
-        .btn-configurator:not(.disabled):hover {
-            background: linear-gradient(135deg, #5a6fd8, #6d28d9) !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3) !important;
-        }
-        
-        .btn-configurator:not(.disabled):active {
-            transform: scale(0.98) !important;
-        }
-        
-        /* Animation pour le notice de maintenance */
-        .maintenance-notice {
-            transition: background 0.3s ease !important;
-        }
-        
-        /* Pulse animation pour attirer l'attention */
-        .btn-configurator:not(.disabled) {
-            animation: configPulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes configPulse {
-            0%, 100% { 
-                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            }
-            50% { 
-                box-shadow: 0 4px 25px rgba(102, 126, 234, 0.5);
-            }
-        }
-        
-        /* Mode sombre */
-        body.dark-mode .maintenance-notice {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
-        }
-        
-        body.dark-mode .maintenance-notice h4 {
-            color: #93c5fd !important;
-        }
-        
-        body.dark-mode .maintenance-notice p {
-            color: #dbeafe !important;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .btn-configurator {
-                font-size: 1rem !important;
-                padding: 12px 25px !important;
-            }
-        }
-    `;
-
-    // Supprimer l'ancien style s'il existe
-    const existingStyle = document.querySelector('#configurator-active-styles');
-    if (existingStyle) {
-        existingStyle.remove();
-    }
-
-    document.head.appendChild(style);
-}
-
-// ========== FONCTION D'INITIALISATION COMPLÈTE ==========
-function initConfiguratorFeatures() {
-    // Mettre à jour les styles
-    updateConfiguratorStyles();
-
-    // Initialiser la redirection
-    initConfiguratorRedirect();
-
-    // Ajouter des métadonnées pour le suivi
-    if (typeof trackConfiguratorAccess === 'function') {
-        trackConfiguratorAccess('button_enabled');
-    }
-
-    console.log('🔧 Fonctionnalités du configurateur initialisées');
-}
-
-// ========== GESTION DES ÉVÉNEMENTS GLOBAUX ==========
-document.addEventListener('DOMContentLoaded', function() {
-    // Attendre que les autres scripts soient chargés
-    setTimeout(() => {
-        if (window.location.pathname.includes('fonctionnalites.html')) {
-            initConfiguratorFeatures();
-        }
-    }, 100);
-});
-
-// ========== INTÉGRATION AVEC LE SCRIPT PRINCIPAL ==========
-// Exposer les fonctions pour utilisation externe
-window.yakoConfigurator = window.yakoConfigurator || {};
-window.yakoConfigurator.initRedirect = initConfiguratorRedirect;
-window.yakoConfigurator.updateStyles = updateConfiguratorStyles;
-
-// ========== GESTION DU MODE SOMBRE POUR LE CONFIGURATEUR ==========
-function updateConfiguratorDarkMode() {
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    const maintenanceNotice = document.querySelector('.maintenance-notice');
-
-    if (maintenanceNotice) {
-        if (isDarkMode) {
-            maintenanceNotice.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)';
-        } else {
-            maintenanceNotice.style.background = 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)';
-        }
-    }
-}
-
-// Observer les changements de mode sombre
-if (typeof MutationObserver !== 'undefined') {
-    const darkModeObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                if (mutation.target === document.body) {
-                    updateConfiguratorDarkMode();
-                }
-            }
-        });
-    });
-
-    darkModeObserver.observe(document.body, {
-        attributes: true,
-        attributeFilter: ['class']
-    });
-}
-
-// ========== ANALYTICS ET TRACKING ==========
-function trackConfiguratorAccess(action) {
-    console.log(`📊 Analytics: Configurateur - ${action}`);
-
-    // Ici vous pouvez ajouter votre code d'analytics
-    // Exemple : gtag('event', 'configurator_access', { action: action });
-}
-
-// ========== EASTER EGG POUR LES DÉVELOPPEURS ==========
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    console.log(`
-    🔧 YAKO Configurateur - Mode Développement
-    
-    Fonctions disponibles :
-    - yakoConfigurator.initRedirect() : Réinitialiser la redirection
-    - yakoConfigurator.updateStyles() : Mettre à jour les styles
-    
-    Le configurateur est maintenant accessible !
-    `);
-}
+console.log('🎨 Styles dynamiques de fonctionnalités ajoutés');
