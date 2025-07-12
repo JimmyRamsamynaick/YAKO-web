@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YAKO Bot - Fonctionnalités</title>
+  <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/fonctionnalites.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -38,6 +39,10 @@
 
   <section class="features-showcase">
     <div class="container">
+      <!-- Barre de recherche -->
+      <input type="text" class="feature-search" placeholder="Rechercher une fonctionnalité... (Ctrl+F)">
+
+      <!-- Onglets des fonctionnalités -->
       <div class="features-tabs">
         <button class="tab-button active" data-tab="moderation">
           <i class="fas fa-shield-alt"></i>
@@ -57,6 +62,7 @@
         </button>
       </div>
 
+      <!-- Contenu des onglets -->
       <div class="tab-content active" id="moderation">
         <div class="feature-section">
           <h2><i class="fas fa-shield-alt"></i> Modération Avancée</h2>
@@ -247,6 +253,55 @@
     </div>
   </section>
 
+  <!-- Section Configuration personnalisée -->
+  <section class="bot-configurator">
+    <div class="container">
+      <h2><i class="fas fa-wrench"></i> Configurateur de Bot</h2>
+      <div class="configurator-content">
+        <div class="configurator-info">
+          <h3>Personnalisez votre YAKO</h3>
+          <p>Sélectionnez les fonctionnalités dont vous avez besoin pour créer un bot sur mesure pour votre serveur.</p>
+          <div class="maintenance-notice">
+            <i class="fas fa-tools"></i>
+            <div>
+              <h4>🚧 En maintenance</h4>
+              <p>Cette fonctionnalité est actuellement en cours de développement. Elle sera bientôt disponible !</p>
+            </div>
+          </div>
+        </div>
+        <div class="configurator-panel">
+          <div class="config-header">
+            <h4>Configuration personnalisée</h4>
+            <span class="maintenance-badge">Bientôt disponible</span>
+          </div>
+          <div class="config-preview">
+            <div class="preview-item">
+              <i class="fas fa-cog"></i>
+              <span>Interface de configuration interactive</span>
+            </div>
+            <div class="preview-item">
+              <i class="fas fa-checkmark"></i>
+              <span>Sélection des commandes souhaitées</span>
+            </div>
+            <div class="preview-item">
+              <i class="fas fa-download"></i>
+              <span>Génération automatique du bot</span>
+            </div>
+            <div class="preview-item">
+              <i class="fas fa-rocket"></i>
+              <span>Invitation directe sur Discord</span>
+            </div>
+          </div>
+          <button class="btn-configurator disabled" disabled>
+            <i class="fas fa-hammer"></i>
+            Configurateur en développement
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Commandes -->
   <section class="commands-section">
     <div class="container">
       <h2><i class="fas fa-terminal"></i> Commandes Principales</h2>
@@ -339,6 +394,7 @@
     </div>
   </section>
 
+  <!-- Section Guide de configuration -->
   <section class="setup-guide">
     <div class="container">
       <h2><i class="fas fa-rocket"></i> Guide de Configuration</h2>
@@ -425,6 +481,7 @@
   </div>
 </footer>
 
+<script src="../js/script.js"></script>
 <script src="js/fonctionnalites.js"></script>
 </body>
 </html>

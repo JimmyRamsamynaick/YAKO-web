@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAKO Bot - Configurateur</title>
+    <meta name="description" content="Configurez votre bot YAKO sur mesure avec les fonctionnalités que vous souhaitez.">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/configurator.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="../index.html" class="nav-brand">
+            <i class="fas fa-robot"></i>
+            <span>YAKO</span>
+        </a>
+        <ul class="nav-menu" role="menubar">
+            <li role="none"><a href="../index.html" class="nav-link" role="menuitem">Accueil</a></li>
+            <li role="none"><a href="fonctionnalites.html" class="nav-link" role="menuitem">Fonctionnalités</a></li>
+            <li role="none"><a href="support.html" class="nav-link" role="menuitem">Support</a></li>
+            <li role="none"><a href="legal.html" class="nav-link" role="menuitem">Légal</a></li>
+            <li role="none"><a href="configurator.html" class="nav-link active" role="menuitem">Configurateur</a></li>
+        </ul>
+        <button class="nav-toggle" aria-label="Ouvrir le menu de navigation" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
+    </div>
+</nav>
+
+<main>
+    <section class="hero">
+        <div class="container">
+            <h1><i class="fas fa-wrench"></i> Configurateur YAKO</h1>
+            <p>Créez votre bot Discord personnalisé en choisissant les fonctionnalités dont vous avez besoin</p>
+        </div>
+    </section>
+
+    <!-- Maintenance Notice -->
+    <section class="maintenance-notice">
+        <div class="container">
+            <div class="notice-content">
+                <div class="notice-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="notice-text">
+                    <h2>🚧 Fonctionnalité en développement</h2>
+                    <p>Le configurateur personnalisé est actuellement en cours de développement. Cette page vous donne un aperçu de ce qui sera bientôt disponible !</p>
+                    <p><strong>Prochainement :</strong> Configuration en temps réel, génération automatique du bot, et invitation directe sur Discord.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Discord Connection -->
+    <section class="discord-connection">
+        <div class="container">
+            <div class="connection-card">
+                <div class="connection-header">
+                    <i class="fab fa-discord"></i>
+                    <h3>Connexion à Discord</h3>
+                    <span class="status-badge disconnected">Non connecté</span>
+                </div>
+                <p>Connectez-vous à Discord pour configurer votre bot personnalisé</p>
+                <button class="btn btn-discord" id="connectDiscord">
+                    <i class="fab fa-discord"></i>
+                    Se connecter avec Discord
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Configuration Steps -->
+    <section class="config-steps">
+        <div class="container">
+            <h2><i class="fas fa-list-ol"></i> Étapes de Configuration</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Connexion Discord</h3>
+                        <p>Connectez-vous avec votre compte Discord pour accéder à vos serveurs</p>
+                        <div class="step-status">
+                            <i class="fas fa-circle pending"></i>
+                            <span>En attente</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Sélection du Serveur</h3>
+                        <p>Choisissez le serveur Discord où vous voulez installer YAKO</p>
+                        <div class="step-status">
+                            <i class="fas fa-circle pending"></i>
+                            <span>En attente</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Configuration des Modules</h3>
+                        <p>Sélectionnez les fonctionnalités que vous souhaitez activer</p>
+                        <div class="step-status">
+                            <i class="fas fa-circle pending"></i>
+                            <span>En attente</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Génération & Installation</h3>
+                        <p>YAKO est configuré et ajouté automatiquement à votre serveur</p>
+                        <div class="step-status">
+                            <i class="fas fa-circle pending"></i>
+                            <span>En attente</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Selection Preview -->
+    <section class="features-selection">
+        <div class="container">
+            <h2><i class="fas fa-puzzle-piece"></i> Aperçu des Modules Disponibles</h2>
+            <p class="section-description">Voici un aperçu des modules que vous pourrez activer/désactiver dans le configurateur final</p>
+
+            <div class="modules-grid">
+                <!-- Modération -->
+                <div class="module-category">
+                    <div class="category-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Modération</h3>
+                        <div class="toggle-preview disabled">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <i class="fas fa-hammer"></i>
+                            <span>Auto-modération</span>
+                            <small>Détection automatique de spam et contenu inapproprié</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-gavel"></i>
+                            <span>Sanctions graduelles</span>
+                            <small>Système d'avertissements et de sanctions automatiques</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-eye"></i>
+                            <span>Logs de modération</span>
+                            <small>Historique détaillé de toutes les actions</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestion -->
+                <div class="module-category">
+                    <div class="category-header">
+                        <i class="fas fa-users"></i>
+                        <h3>Gestion</h3>
+                        <div class="toggle-preview disabled">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Messages de bienvenue</span>
+                            <small>Accueil personnalisé pour nouveaux membres</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-id-badge"></i>
+                            <span>Gestion des rôles</span>
+                            <small>Attribution automatique et rôles par réaction</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Statistiques</span>
+                            <small>Suivi de l'activité et de l'engagement</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divertissement -->
+                <div class="module-category">
+                    <div class="category-header">
+                        <i class="fas fa-gamepad"></i>
+                        <h3>Divertissement</h3>
+                        <div class="toggle-preview disabled">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <i class="fas fa-music"></i>
+                            <span>Lecteur de musique</span>
+                            <small>Support YouTube, Spotify et autres plateformes</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-trophy"></i>
+                            <span>Système de niveaux</span>
+                            <small>XP, niveaux et récompenses pour les membres</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-dice"></i>
+                            <span>Mini-jeux</span>
+                            <small>Collection de jeux interactifs</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Utilitaires -->
+                <div class="module-category">
+                    <div class="category-header">
+                        <i class="fas fa-tools"></i>
+                        <h3>Utilitaires</h3>
+                        <div class="toggle-preview disabled">
+                            <input type="checkbox" disabled>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Planificateur</span>
+                            <small>Événements et rappels automatiques</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-poll"></i>
+                            <span>Sondages avancés</span>
+                            <small>Système de votes avec options multiples</small>
+                        </div>
+                        <div class="module-item">
+                            <i class="fas fa-robot"></i>
+                            <span>IA intégrée</span>
+                            <small>Assistant intelligent pour répondre aux questions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Preview -->
+    <section class="progress-preview">
+        <div class="container">
+            <h2><i class="fas fa-tasks"></i> Progression de la Configuration</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-steps">
+                    <div class="progress-step active">
+                        <div class="step-circle">1</div>
+                        <span>Connexion</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">2</div>
+                        <span>Serveur</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">3</div>
+                        <span>Modules</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">4</div>
+                        <span>Installation</span>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-info">
+                <p><strong>Étape actuelle :</strong> En attente de la connexion Discord</p>
+                <p><strong>Temps estimé :</strong> 5-10 minutes</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beta Preview -->
+    <section class="beta-preview">
+        <div class="container">
+            <div class="beta-card">
+                <div class="beta-header">
+                    <i class="fas fa-flask"></i>
+                    <h3>Accès Bêta</h3>
+                    <span class="beta-badge">Bientôt</span>
+                </div>
+                <p>Soyez parmi les premiers à tester le configurateur personnalisé ! Inscrivez-vous pour être notifié de sa sortie.</p>
+                <div class="beta-actions">
+                    <button class="btn btn-secondary" id="notifyMe">
+                        <i class="fas fa-bell"></i>
+                        Me notifier
+                    </button>
+                    <button class="btn btn-outline" id="learnMore">
+                        <i class="fas fa-info-circle"></i>
+                        En savoir plus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <i class="fas fa-robot"></i>
+                    <span>YAKO</span>
+                </div>
+                <p>Le bot Discord de référence pour l'administration de serveurs.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="fonctionnalites.html">Fonctionnalités</a></li>
+                    <li><a href="support.html">Support</a></li>
+                    <li><a href="legal.html">Légal</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Configurateur</h4>
+                <ul>
+                    <li><a href="#discord-connection">Connexion Discord</a></li>
+                    <li><a href="#modules">Modules disponibles</a></li>
+                    <li><a href="#beta">Accès bêta</a></li>
+                    <li><a href="support.html">Aide configuration</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 YAKO Bot. Tous droits réservés.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="../js/script.js"></script>
+<script src="js/configurator.js"></script>
+</body>
+</html>

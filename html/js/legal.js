@@ -1850,4 +1850,426 @@ dynamicStyles.textContent = `
 
 document.head.appendChild(dynamicStyles);
 
+// Ajout à legal.js pour masquer la barre de navigation au scroll
+
+// ========== GESTION DU SCROLL POUR LA NAVIGATION LÉGALE ==========
+function initLegalNavScroll() {
+    const legalNav = document.querySelector('.legal-nav');
+    if (!legalNav) return;
+
+    let lastScrollY = window.scrollY;
+    let isNavVisible = true;
+    let scrollTimeout;
+
+    function handleScroll() {
+        const currentScrollY = window.scrollY;
+        const scrollDifference = Math.abs(currentScrollY - lastScrollY);
+
+        // Ne pas réagir aux petits mouvements de scroll
+        if (scrollDifference < 5) return;
+
+        // Masquer si on scroll vers le bas et qu'on a dépassé la hauteur de la nav
+        if (currentScrollY > lastScrollY && currentScrollY > 150) {
+            hideLegalNav();
+        }
+        // Afficher si on scroll vers le haut
+        else if (currentScrollY < lastScrollY) {
+            showLegalNav();
+        }
+
+        lastScrollY = currentScrollY;
+
+        // Toujours afficher la nav après 2 secondes d'inactivité
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            showLegalNav();
+        }, 2000);
+    }
+
+    function hideLegalNav() {
+        if (isNavVisible && window.innerWidth > 768) { // Seulement sur desktop
+            legalNav.classList.add('hidden');
+            isNavVisible = false;
+            console.log('📱 Navigation légale masquée');
+        }
+    }
+
+    function showLegalNav() {
+        if (!isNavVisible) {
+            legalNav.classList.remove('hidden');
+            isNavVisible = true;
+            console.log('📱 Navigation légale affichée');
+        }
+    }
+
+    // Événement de scroll avec throttling
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                handleScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Toujours afficher la nav au hover
+    legalNav.addEventListener('mouseenter', showLegalNav);
+
+    // Afficher la nav quand on atteint le haut de la page
+    window.addEventListener('scroll', () => {
+        if (window.scrollY < 100) {
+            showLegalNav();
+        }
+    });
+
+    // Gestion responsive
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+            showLegalNav(); // Toujours visible sur mobile
+        }
+    });
+
+    console.log('✅ Gestion du scroll de la navigation légale initialisée');
+}
+
+// ========== AMÉLIORATION DU MODE SOMBRE POUR TOUTES LES PAGES ==========
+function initUniversalDarkMode() {
+    console.log('🌙 Configuration du mode sombre universel');
+
+    // Créer le bouton s'il n'existe pas
+    let darkModeToggle = document.querySelector('.dark-mode-toggle');
+
+    if (!darkModeToggle) {
+        darkModeToggle = document.createElement('button');
+        darkModeToggle.className = 'dark-mode-toggle';
+        darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        darkModeToggle.setAttribute('title', 'Basculer le mode sombre (Ctrl+D)');
+        darkModeToggle.setAttribute('aria-label', 'Basculer entre mode clair et mode sombre');
+
+        // Styles du bouton
+        darkModeToggle.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: #667eea;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        `;
+
+        document.body.appendChild(darkModeToggle);
+    }
+
+    // Restaurer la préférence sauvegardée
+    const savedDarkMode = localStorage.getItem('yakoGlobalDarkMode') === 'true';
+    if (savedDarkMode) {
+        enableDarkMode();
+    }
+
+    // Détecter la préférence système si aucune préférence sauvegardée
+    if (!localStorage.getItem('yakoGlobalDarkMode')) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            enableDarkMode();
+        }
+    }
+
+    // Event listener pour le bouton
+    darkModeToggle.addEventListener('click', toggleDarkMode);
+
+    // Raccourci clavier Ctrl+D
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+            e.preventDefault();
+            toggleDarkMode();
+        }
+    });
+
+    // Écouter les changements de préférence système
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('yakoGlobalDarkMode')) {
+            if (e.matches) {
+                enableDarkMode();
+            } else {
+                disableDarkMode();
+            }
+        }
+    });
+
+    function enableDarkMode() {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        darkModeToggle.style.background = '#fbbf24';
+        darkModeToggle.style.boxShadow = '0 4px 15px rgba(251, 191, 36, 0.3)';
+
+        // Mettre à jour les éléments spécifiques selon la page
+        updatePageSpecificDarkMode(true);
+    }
+
+    function disableDarkMode() {
+        document.body.classList.remove('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        darkModeToggle.style.background = '#667eea';
+        darkModeToggle.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
+
+        // Mettre à jour les éléments spécifiques selon la page
+        updatePageSpecificDarkMode(false);
+    }
+
+    function toggleDarkMode() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+
+        if (isDarkMode) {
+            disableDarkMode();
+        } else {
+            enableDarkMode();
+        }
+
+        // Sauvegarder la préférence
+        localStorage.setItem('yakoGlobalDarkMode', !isDarkMode);
+
+        // Notification
+        if (window.yakoUtils && window.yakoUtils.showNotification) {
+            window.yakoUtils.showNotification(
+                `${!isDarkMode ? '🌙 Mode sombre' : '☀️ Mode clair'} activé`,
+                'info',
+                2000
+            );
+        }
+
+        console.log(`🌙 Mode ${!isDarkMode ? 'sombre' : 'clair'} activé`);
+    }
+
+    function updatePageSpecificDarkMode(isDark) {
+        // Mettre à jour les formulaires
+        const forms = document.querySelectorAll('form, .contact-form');
+        forms.forEach(form => {
+            const inputs = form.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                if (isDark) {
+                    input.style.background = '#374151';
+                    input.style.borderColor = '#4b5563';
+                    input.style.color = '#e2e8f0';
+                } else {
+                    input.style.background = '';
+                    input.style.borderColor = '';
+                    input.style.color = '';
+                }
+            });
+        });
+
+        // Mettre à jour les cookies toggles si présents
+        const cookieToggles = document.querySelectorAll('.cookie-toggle input[type="checkbox"]:not([disabled])');
+        cookieToggles.forEach(toggle => {
+            const slider = toggle.nextElementSibling;
+            if (slider && slider.classList.contains('toggle-slider')) {
+                if (isDark) {
+                    if (toggle.checked) {
+                        slider.style.background = '#10b981';
+                    } else {
+                        slider.style.background = '#4b5563';
+                    }
+                } else {
+                    if (toggle.checked) {
+                        slider.style.background = '#7c2d12';
+                    } else {
+                        slider.style.background = '#d1d5db';
+                    }
+                }
+            }
+        });
+
+        // Mettre à jour le badge de cookies si présent
+        const cookieBadge = document.querySelector('.cookie-status-badge');
+        if (cookieBadge) {
+            if (isDark) {
+                cookieBadge.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.5)';
+            } else {
+                cookieBadge.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+            }
+        }
+    }
+
+    // Exposer les fonctions globalement
+    window.yakoGlobalDarkMode = {
+        toggle: toggleDarkMode,
+        enable: enableDarkMode,
+        disable: disableDarkMode,
+        isEnabled: () => document.body.classList.contains('dark-mode')
+    };
+
+    console.log('✅ Mode sombre universel initialisé');
+}
+
+// ========== AMÉLIORATION DU FORMULAIRE DE CONTACT ==========
+function enhanceContactForm() {
+    const contactForm = document.querySelector('.contact-form');
+    if (!contactForm) return;
+
+    console.log('📧 Amélioration du formulaire de contact');
+
+    // Améliorer la validation en temps réel
+    const inputs = contactForm.querySelectorAll('input, textarea, select');
+
+    inputs.forEach(input => {
+        // Styles pour le mode sombre
+        function updateInputStyles() {
+            const isDark = document.body.classList.contains('dark-mode');
+            if (isDark) {
+                input.style.background = '#374151';
+                input.style.borderColor = '#4b5563';
+                input.style.color = '#e2e8f0';
+            } else {
+                input.style.background = '';
+                input.style.borderColor = '';
+                input.style.color = '';
+            }
+        }
+
+        // Appliquer les styles initiaux
+        updateInputStyles();
+
+        // Observer les changements de mode sombre
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    updateInputStyles();
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        // Effets de focus améliorés
+        input.addEventListener('focus', () => {
+            const isDark = document.body.classList.contains('dark-mode');
+            if (isDark) {
+                input.style.borderColor = '#10b981';
+                input.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+            } else {
+                input.style.borderColor = '#059669';
+                input.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.1)';
+            }
+        });
+
+        input.addEventListener('blur', () => {
+            input.style.boxShadow = '';
+            updateInputStyles();
+        });
+    });
+
+    // Améliorer l'accessibilité
+    const form = contactForm;
+    form.setAttribute('novalidate', 'true'); // Désactiver la validation HTML5 par défaut
+
+    // Ajouter des attributs ARIA
+    inputs.forEach((input, index) => {
+        const label = form.querySelector(`label[for="${input.id}"]`);
+        if (label && !input.getAttribute('aria-describedby')) {
+            const helpTextId = `${input.id}-help`;
+            input.setAttribute('aria-describedby', helpTextId);
+        }
+    });
+
+    console.log('✅ Formulaire de contact amélioré');
+}
+
+// ========== INITIALISATION POUR TOUTES LES PAGES ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser selon la page
+    const currentPage = window.location.pathname;
+
+    if (currentPage.includes('legal.html')) {
+        initLegalNavScroll();
+    }
+
+    // Initialiser le mode sombre universel sur toutes les pages
+    initUniversalDarkMode();
+
+    // Améliorer le formulaire de contact sur la page support
+    if (currentPage.includes('support.html')) {
+        enhanceContactForm();
+    }
+
+    console.log('✅ Améliorations universelles initialisées');
+});
+
+// Ajouter les styles CSS nécessaires
+if (!document.querySelector('#universal-improvements-styles')) {
+    const style = document.createElement('style');
+    style.id = 'universal-improvements-styles';
+    style.textContent = `
+        /* Styles pour l'amélioration universelle */
+        .dark-mode-toggle:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+        
+        /* Amélioration des formulaires en mode sombre */
+        body.dark-mode input:focus,
+        body.dark-mode textarea:focus,
+        body.dark-mode select:focus {
+            background: #475569 !important;
+        }
+        
+        body.dark-mode input::placeholder,
+        body.dark-mode textarea::placeholder {
+            color: #9ca3af !important;
+        }
+        
+        /* Transition fluide pour le mode sombre */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Masquage de la navigation légale */
+        .legal-nav.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Responsive pour mobile */
+        @media (max-width: 768px) {
+            .dark-mode-toggle {
+                bottom: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+            
+            .legal-nav.hidden {
+                transform: none !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+        }
+        
+        /* Performance - utiliser GPU */
+        .legal-nav, .dark-mode-toggle {
+            will-change: transform;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Exposer les fonctions utilitaires
+window.yakoImprovements = {
+    initLegalNavScroll,
+    initUniversalDarkMode,
+    enhanceContactForm
+};
+
 console.log('🎨 Styles dynamiques ajoutés');

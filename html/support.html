@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YAKO Bot - Support</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="css/support.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -70,6 +71,7 @@
     <section id="faq" class="faq-section">
         <div class="container">
             <h2><i class="fas fa-question-circle"></i> Questions Fréquentes</h2>
+            <input type="text" class="faq-search" placeholder="Rechercher dans la FAQ... (Ctrl+K)">
             <div class="faq-container">
                 <div class="faq-category">
                     <h3><i class="fas fa-plus-circle"></i> Installation & Configuration</h3>
@@ -256,6 +258,10 @@
 
                 <div class="contact-form-container">
                     <form class="contact-form" action="https://formspree.io/f/xvgrvkqr" method="POST">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_next" value="https://yakobot.com/merci">
+                        <input type="hidden" name="_subject" value="Nouveau message de support YAKO">
+
                         <div class="form-group">
                             <label for="email">
                                 <i class="fas fa-envelope"></i>
@@ -325,6 +331,13 @@
     <section class="resources-section">
         <div class="container">
             <h2><i class="fas fa-book-open"></i> Ressources Utiles</h2>
+            <div class="resource-filters">
+                <button class="filter-btn active">Tous</button>
+                <button class="filter-btn">Tutoriels</button>
+                <button class="filter-btn">Documentation</button>
+                <button class="filter-btn">Communauté</button>
+                <button class="filter-btn">Actualités</button>
+            </div>
             <div class="resources-grid">
                 <div class="resource-card">
                     <div class="resource-icon">
@@ -396,6 +409,7 @@
     </div>
 </footer>
 
+<script src="../js/script.js"></script>
 <script src="js/support.js"></script>
 </body>
 </html>
