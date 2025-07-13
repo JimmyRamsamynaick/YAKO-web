@@ -84,9 +84,10 @@ YAKO est le bot d’administration Discord conçu pour vous offrir **puissance**
 ├── LICENSE             # Licence open-source MIT
 └── README.md           # Documentation projet
 ```
+---
 
+## 💻 Installation & Usage
 ```bash
-💻 Installation & Usage
 Cloner le dépôt
 bash
 git clone https://github.com/JimmyRamsamynaick/YAKO-web.git
@@ -108,8 +109,10 @@ copyToClipboard(text) → fonction de copie vers le presse-papier
 Intersection Observer → threshold modifiable
 Navbar scroll threshold dans script.js
 Fonts & Icons Changez la source Google Fonts ou Font Awesome selon vos préférences. 
-
-📜 Commandes principales
+```
+---
+## 📜 Commandes principales
+```bash
 Exemples de commandes disponibles sur YAKO :
 Commande	Description
 /ban <user>	Bannir un membre avec logs automatiques
@@ -119,12 +122,16 @@ Commande	Description
 /stats	Afficher les statistiques du serveur
 /config	Accéder au panneau de configuration rapide
 ```
-Pour la liste complète, visitez la section Commandes de la page. \
-🆘 Support & Contribution \
+Pour la liste complète, visitez la section Commandes de la page. 
+
+---
+## 🆘 Support & Contribution 
 💬 Support Discord : Rejoignez notre serveur \
 🐞 Bugs & Issues : Ouvrez une issue sur GitHub \
 🤝 Contribuer : Forkez le repo, créez une branche, faites un PR \
-Merci aux contributeurs pour leur temps et leurs idées ! \
-⚖️ Licence \
+Merci aux contributeurs pour leur temps et leurs idées ! 
+
+---
+## ⚖️ Licence 
 Ce projet est distribué sous la licence MIT. Voir le fichier LICENSE pour plus de détails. \
 Développé avec ❤️ par la communauté YAKO – 2025
