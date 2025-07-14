@@ -1,4 +1,4 @@
-// YAKO Legal - Version corrigée avec gestion complète des cookies et aide améliorée
+// YAKO Legal - Version corrigée complète
 class YakoLegal {
     constructor() {
         this.currentSection = 'mentions';
@@ -27,6 +27,7 @@ class YakoLegal {
         this.setupKeyboardShortcuts();
         this.setupAnimations();
         this.setupNavbarEffects();
+        this.setupScrollToTop();
         this.loadInitialState();
 
         console.log('✅ YAKO Legal - Toutes les fonctionnalités initialisées');
@@ -232,38 +233,48 @@ class YakoLegal {
         this.announceTabChange(targetSection);
     }
 
-    // ========== NAVIGATION AU SCROLL ==========
+    // ========== NAVIGATION AU SCROLL (CORRECTION DU BUG) ==========
     setupScrollNavigation() {
         let ticking = false;
+        let scrollThreshold = 200;
 
         window.addEventListener('scroll', () => {
             if (!ticking) {
                 requestAnimationFrame(() => {
-                    this.handleLegalNavScroll();
+                    this.handleLegalNavScroll(scrollThreshold);
                     this.handleNavbarScroll();
+                    this.updateScrollToTopButton();
                     ticking = false;
                 });
                 ticking = true;
             }
         });
 
+        // Empêcher le masquage au survol
         const legalNav = document.querySelector('.legal-nav');
         if (legalNav) {
             legalNav.addEventListener('mouseenter', () => {
-                if (window.scrollY <= 200) this.showLegalNav();
+                this.showLegalNav();
             });
         }
     }
 
-    handleLegalNavScroll() {
+    handleLegalNavScroll(threshold) {
         const currentScrollY = window.scrollY;
         const scrollDifference = Math.abs(currentScrollY - this.lastScrollY);
 
-        if (scrollDifference < 5) return;
+        // Réduire la sensibilité
+        if (scrollDifference < 10) return;
 
-        if (currentScrollY > this.lastScrollY && currentScrollY > 200) {
+        const legalNav = document.querySelector('.legal-nav');
+        if (!legalNav) return;
+
+        // Masquer seulement si on scroll vers le bas ET qu'on dépasse le seuil
+        if (currentScrollY > this.lastScrollY && currentScrollY > threshold) {
             this.hideLegalNav();
-        } else if (currentScrollY < this.lastScrollY || currentScrollY <= 100) {
+        }
+        // Afficher si on scroll vers le haut OU si on est en haut de page
+        else if (currentScrollY < this.lastScrollY || currentScrollY <= 100) {
             this.showLegalNav();
         }
 
@@ -286,7 +297,36 @@ class YakoLegal {
         }
     }
 
-    // ========== GESTION DES COOKIES ==========
+    // ========== BOUTON RETOUR EN HAUT ==========
+    setupScrollToTop() {
+        const scrollToTopBtn = document.createElement('button');
+        scrollToTopBtn.className = 'scroll-to-top';
+        scrollToTopBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+        scrollToTopBtn.title = 'Retour en haut';
+        scrollToTopBtn.setAttribute('aria-label', 'Retour en haut de la page');
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        document.body.appendChild(scrollToTopBtn);
+    }
+
+    updateScrollToTopButton() {
+        const scrollBtn = document.querySelector('.scroll-to-top');
+        if (scrollBtn) {
+            if (window.scrollY > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        }
+    }
+
+    // ========== GESTION DES COOKIES (CORRECTION DES TOGGLES) ==========
     setupCookies() {
         this.loadCookiePreferences();
         this.bindCookieEvents();
@@ -298,7 +338,6 @@ class YakoLegal {
         console.log('🍪 Chargement des préférences de cookies');
         const preferences = JSON.parse(localStorage.getItem('cookiePreferences') || JSON.stringify(this.defaultCookieSettings));
 
-        // Charger les toggles principaux dans la page
         this.updateCookieToggles(preferences);
         this.applyCookiePreferences(preferences);
         this.updateCookieStatusBadge(preferences);
@@ -335,7 +374,31 @@ class YakoLegal {
             });
         }
 
-        // Gérer les toggles de la page principale
+        // CORRECTION: Gérer les clics sur les labels ET les toggles
+        document.addEventListener('click', (e) => {
+            // Clic sur le slider
+            if (e.target.matches('.toggle-slider')) {
+                e.preventDefault();
+                const checkbox = e.target.previousElementSibling;
+                if (checkbox && checkbox.type === 'checkbox' && !checkbox.disabled) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            // Clic sur le label
+            else if (e.target.closest('.cookie-toggle label') && !e.target.matches('input')) {
+                e.preventDefault();
+                const label = e.target.closest('.cookie-toggle label');
+                const toggle = label.closest('.cookie-toggle');
+                const checkbox = toggle.querySelector('input[type="checkbox"]');
+                if (checkbox && !checkbox.disabled) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+
+        // Gérer les changements d'état des checkboxes
         document.addEventListener('change', (e) => {
             if (e.target.matches('.cookie-toggle input[type="checkbox"]:not([disabled])')) {
                 this.handleToggleChange(e.target);
@@ -354,10 +417,10 @@ class YakoLegal {
 
     collectCookiePreferences() {
         const preferences = {};
-        const cookieToggles = document.querySelectorAll('.cookie-toggle input[type="checkbox"]:not([disabled])');
+        const cookieToggles = document.querySelectorAll('.cookie-toggle input[type="checkbox"]:not([disabled]):not([id^="modal-"])');
 
         cookieToggles.forEach(toggle => {
-            const cookieType = toggle.id.replace('-cookies', '').replace('modal-', '');
+            const cookieType = toggle.id.replace('-cookies', '');
             preferences[cookieType] = toggle.checked;
             toggle.setAttribute('aria-checked', toggle.checked);
         });
@@ -366,13 +429,25 @@ class YakoLegal {
     }
 
     resetCookiePreferences() {
-        // Réinitialiser tous les toggles
         this.updateCookieToggles(this.defaultCookieSettings);
+        this.synchronizeAllToggles();
 
         localStorage.removeItem('cookiePreferences');
         this.applyCookiePreferences(this.defaultCookieSettings);
         this.updateCookieStatusBadge(this.defaultCookieSettings);
         this.showNotification('🔄 Préférences de cookies réinitialisées aux valeurs par défaut', 'info');
+    }
+
+    synchronizeAllToggles() {
+        const preferences = this.defaultCookieSettings;
+
+        Object.keys(preferences).forEach(cookieType => {
+            const modalToggle = document.getElementById(`modal-${cookieType}-cookies`);
+            if (modalToggle) {
+                modalToggle.checked = preferences[cookieType];
+                this.updateToggleVisual(modalToggle);
+            }
+        });
     }
 
     handleToggleChange(toggle) {
@@ -394,13 +469,27 @@ class YakoLegal {
             localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
             this.applyCookiePreferences(preferences);
             this.updateCookieStatusBadge(preferences);
-
-            // Synchroniser avec la modal si elle est ouverte
-            const modal = document.querySelector('.cookie-modal');
-            if (modal && this.cookieModalVisible) {
-                this.loadModalPreferences(modal);
-            }
+            this.synchronizeCorrespondingToggle(toggle);
         }, 100);
+    }
+
+    synchronizeCorrespondingToggle(changedToggle) {
+        const isModal = changedToggle.id.startsWith('modal-');
+        const cookieType = changedToggle.id.replace('modal-', '').replace('-cookies', '');
+
+        if (isModal) {
+            const mainToggle = document.getElementById(`${cookieType}-cookies`);
+            if (mainToggle) {
+                mainToggle.checked = changedToggle.checked;
+                this.updateToggleVisual(mainToggle);
+            }
+        } else {
+            const modalToggle = document.getElementById(`modal-${cookieType}-cookies`);
+            if (modalToggle) {
+                modalToggle.checked = changedToggle.checked;
+                this.updateToggleVisual(modalToggle);
+            }
+        }
     }
 
     updateToggleVisual(toggle) {
@@ -419,7 +508,6 @@ class YakoLegal {
     applyCookiePreferences(preferences) {
         console.log('⚙️ Application des préférences:', preferences);
 
-        // Gestion des cookies analytiques (Google Analytics exemple)
         if (preferences.analytics && typeof gtag !== 'undefined') {
             gtag('consent', 'update', {
                 'analytics_storage': 'granted'
@@ -432,14 +520,12 @@ class YakoLegal {
             console.log('❌ Cookies analytiques désactivés');
         }
 
-        // Gestion des cookies de performance
         if (preferences.performance) {
             this.enablePerformanceFeatures();
         } else {
             this.disablePerformanceFeatures();
         }
 
-        // Gestion des cookies de préférences
         if (preferences.preferences) {
             console.log('✅ Cookies de préférences activés');
         } else {
@@ -448,7 +534,6 @@ class YakoLegal {
     }
 
     enablePerformanceFeatures() {
-        // Activer le cache des ressources
         if ('serviceWorker' in navigator) {
             console.log('🚀 Fonctionnalités de performance activées');
         }
@@ -459,7 +544,7 @@ class YakoLegal {
     }
 
     createCookieStatusBadge() {
-        // Supprimer le badge existant s'il y en a un
+        // Supprimer le badge existant
         const existingBadge = document.querySelector('.cookie-status-badge');
         if (existingBadge) {
             existingBadge.remove();
@@ -467,32 +552,19 @@ class YakoLegal {
 
         const statusBadge = document.createElement('div');
         statusBadge.className = 'cookie-status-badge';
-        statusBadge.style.cssText = `
-            position: fixed; 
-            bottom: 80px; 
-            right: 20px; 
-            padding: 8px 12px;
-            border-radius: 20px; 
-            font-size: 0.8rem; 
-            font-weight: 600; 
-            z-index: 999;
-            transition: all 0.3s ease; 
-            cursor: pointer; 
-            user-select: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        `;
 
         statusBadge.addEventListener('click', () => this.showCookieModal());
         statusBadge.addEventListener('mouseenter', () => {
-            statusBadge.style.transform = 'translateY(-2px)';
-            statusBadge.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
+            statusBadge.style.transform = 'translateY(-3px) scale(1.05)';
+            statusBadge.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.35)';
         });
         statusBadge.addEventListener('mouseleave', () => {
-            statusBadge.style.transform = 'translateY(0)';
-            statusBadge.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+            statusBadge.style.transform = 'translateY(0) scale(1)';
+            statusBadge.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.25)';
         });
 
         document.body.appendChild(statusBadge);
+
         return statusBadge;
     }
 
@@ -506,7 +578,7 @@ class YakoLegal {
         const enabledCount = Object.values(preferences).filter(Boolean).length;
         const totalCount = Object.keys(preferences).length;
 
-        statusBadge.textContent = `🍪 ${enabledCount}/${totalCount}`;
+        statusBadge.innerHTML = `<i class="fas fa-cookie-bite" style="margin-right: 8px;"></i>${enabledCount}/${totalCount}`;
         statusBadge.title = `${enabledCount} types de cookies activés sur ${totalCount} - Cliquer pour gérer`;
 
         this.updateBadgeColor(statusBadge, enabledCount, totalCount);
@@ -514,13 +586,13 @@ class YakoLegal {
 
     updateBadgeColor(badge, enabledCount, totalCount) {
         if (enabledCount === 0) {
-            badge.style.background = '#ef4444';
+            badge.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
             badge.style.color = 'white';
         } else if (enabledCount === totalCount) {
-            badge.style.background = '#10b981';
+            badge.style.background = 'linear-gradient(135deg, #10b981, #059669)';
             badge.style.color = 'white';
         } else {
-            badge.style.background = '#f59e0b';
+            badge.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
             badge.style.color = 'white';
         }
     }
@@ -544,7 +616,6 @@ class YakoLegal {
         this.cookieModalVisible = true;
         this.bindModalEvents(modal);
 
-        // Mettre le focus sur la modal pour l'accessibilité
         setTimeout(() => modal.focus(), 100);
     }
 
@@ -617,7 +688,39 @@ class YakoLegal {
 
     bindModalEvents(modal) {
         modal.querySelectorAll('.cookie-toggle input').forEach(toggle => {
-            toggle.addEventListener('change', () => this.updateToggleVisual(toggle));
+            toggle.addEventListener('change', () => {
+                this.updateToggleVisual(toggle);
+                this.synchronizeCorrespondingToggle(toggle);
+            });
+        });
+
+        // Gérer les clics sur les sliders dans la modal
+        modal.querySelectorAll('.toggle-slider').forEach(slider => {
+            slider.addEventListener('click', (e) => {
+                e.preventDefault();
+                const checkbox = slider.previousElementSibling;
+                if (checkbox && checkbox.type === 'checkbox' && !checkbox.disabled) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+
+        // Gérer les clics sur les labels dans la modal
+        modal.querySelectorAll('.cookie-option label').forEach(label => {
+            label.addEventListener('click', (e) => {
+                if (e.target.tagName === 'LABEL') {
+                    e.preventDefault();
+                    const forId = label.getAttribute('for');
+                    if (forId) {
+                        const checkbox = document.getElementById(forId);
+                        if (checkbox && !checkbox.disabled) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                }
+            });
         });
 
         // Fermeture par Échap
@@ -656,14 +759,12 @@ class YakoLegal {
     }
 
     updateMainToggles(preferences) {
-        const cookieToggles = document.querySelectorAll('.cookie-toggle input[type="checkbox"]:not([disabled])');
+        const cookieToggles = document.querySelectorAll('.cookie-toggle input[type="checkbox"]:not([disabled]):not([id^="modal-"])');
         cookieToggles.forEach(toggle => {
-            if (!toggle.id.startsWith('modal-')) {
-                const cookieType = toggle.id.replace('-cookies', '');
-                if (preferences[cookieType] !== undefined) {
-                    toggle.checked = preferences[cookieType];
-                    this.updateToggleVisual(toggle);
-                }
+            const cookieType = toggle.id.replace('-cookies', '');
+            if (preferences[cookieType] !== undefined) {
+                toggle.checked = preferences[cookieType];
+                this.updateToggleVisual(toggle);
             }
         });
     }
@@ -800,10 +901,6 @@ class YakoLegal {
     createSearchResultsDiv() {
         const resultDiv = document.createElement('div');
         resultDiv.className = 'search-results';
-        resultDiv.style.cssText = `
-            text-align: center; padding: 20px; margin: 20px 0; border-radius: 12px;
-            font-weight: 500; animation: fadeIn 0.3s ease;
-        `;
 
         const legalContent = document.querySelector('.legal-content .container');
         const searchInput = legalContent ? legalContent.querySelector('.legal-search') : null;
@@ -815,9 +912,7 @@ class YakoLegal {
     }
 
     showNoResults(resultDiv, searchTerm) {
-        resultDiv.style.background = '#fef2f2';
-        resultDiv.style.color = '#dc2626';
-        resultDiv.style.border = '2px solid #fecaca';
+        resultDiv.className = 'search-results no-results';
         resultDiv.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
                 <i class="fas fa-search" style="font-size: 1.2rem;"></i>
@@ -844,20 +939,14 @@ class YakoLegal {
             if (count > 0) {
                 sectionsHTML += `
                     <span onclick="switchLegalSection('${sectionId}')" 
-                          style="display: inline-block; margin: 5px; padding: 6px 12px; 
-                                 background: rgba(124, 45, 18, 0.1); border: 1px solid rgba(124, 45, 18, 0.3);
-                                 border-radius: 20px; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem;"
-                          onmouseenter="this.style.background='rgba(124, 45, 18, 0.2)'"
-                          onmouseleave="this.style.background='rgba(124, 45, 18, 0.1)'">
+                          class="search-section-link">
                         ${sectionNames[sectionId] || sectionId}: ${count} occurrence${count > 1 ? 's' : ''}
                     </span>
                 `;
             }
         });
 
-        resultDiv.style.background = '#f0fdf4';
-        resultDiv.style.color = '#16a34a';
-        resultDiv.style.border = '2px solid #bbf7d0';
+        resultDiv.className = 'search-results has-results';
         resultDiv.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px;">
                 <i class="fas fa-check-circle" style="font-size: 1.2rem;"></i>
@@ -892,7 +981,7 @@ class YakoLegal {
         this.searchResults = [];
     }
 
-    // ========== RACCOURCIS CLAVIER ==========
+    // ========== RACCOURCIS CLAVIER (CORRECTION AIDE) ==========
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => this.handleGlobalKeydown(e));
     }
@@ -951,225 +1040,43 @@ class YakoLegal {
 
     showKeyboardHelp() {
         const helpHTML = `
-            <div class="help-modal-content">
-                <div class="help-header">
-                    <h2><i class="fas fa-keyboard"></i> Centre d'Aide YAKO Legal</h2>
-                    <p>Raccourcis clavier et fonctionnalités disponibles</p>
-                </div>
-
-                <div class="help-sections">
-                    <div class="help-section">
-                        <h3><i class="fas fa-rocket"></i> Raccourcis Principaux</h3>
-                        <div class="help-grid">
-                            <div class="help-item">
-                                <kbd>Ctrl+F</kbd>
-                                <span>Rechercher dans les documents légaux</span>
-                            </div>
-                            <div class="help-item">
-                                <kbd>Ctrl+D</kbd>
-                                <span>Basculer entre mode clair/sombre</span>
-                            </div>
-                            <div class="help-item">
-                                <kbd>Échap</kbd>
-                                <span>Fermer tous les panneaux ouverts</span>
-                            </div>
-                            <div class="help-item">
-                                <kbd>H</kbd>
-                                <span>Afficher cette aide</span>
-                            </div>
-                        </div>
+            <div style="max-width: 500px; background: white; border-radius: 15px; padding: 25px; color: #333; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                <h3 style="margin-bottom: 25px; color: #7c2d12; display: flex; align-items: center; gap: 12px; font-size: 1.3rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                    <i class="fas fa-keyboard" style="color: #fbbf24;"></i> Raccourcis clavier
+                </h3>
+                <div style="display: grid; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">Ctrl+F</kbd>
+                        <span style="color: #374151; font-weight: 500;">Rechercher dans les documents</span>
                     </div>
-
-                    <div class="help-section">
-                        <h3><i class="fas fa-compass"></i> Navigation</h3>
-                        <div class="help-grid">
-                            <div class="help-item">
-                                <kbd>1</kbd>
-                                <span>Aller aux Mentions Légales</span>
-                            </div>
-                            <div class="help-item">
-                                <kbd>2</kbd>
-                                <span>Aller à la Politique de Confidentialité</span>
-                            </div>
-                            <div class="help-item">
-                                <kbd>3</kbd>
-                                <span>Aller aux Conditions d'Utilisation</span>
-                            </div>
-                            <div class="help-item">
-                                <kbd>4</kbd>
-                                <span>Aller à la Politique des Cookies</span>
-                            </div>
-                        </div>
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">Ctrl+D</kbd>
+                        <span style="color: #374151; font-weight: 500;">Basculer le mode sombre/clair</span>
                     </div>
-
-                    <div class="help-section">
-                        <h3><i class="fas fa-search"></i> Recherche Avancée</h3>
-                        <div class="help-tips">
-                            <div class="help-tip">
-                                <i class="fas fa-lightbulb"></i>
-                                <div>
-                                    <strong>Recherche intelligente :</strong>
-                                    <p>Tapez au moins 2 caractères pour lancer la recherche automatiquement</p>
-                                </div>
-                            </div>
-                            <div class="help-tip">
-                                <i class="fas fa-highlight"></i>
-                                <div>
-                                    <strong>Mise en évidence :</strong>
-                                    <p>Les termes trouvés sont surlignés dans le texte pour un repérage facile</p>
-                                </div>
-                            </div>
-                            <div class="help-tip">
-                                <i class="fas fa-filter"></i>
-                                <div>
-                                    <strong>Filtrage par section :</strong>
-                                    <p>Cliquez sur les badges de résultats pour naviguer directement vers une section</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">Échap</kbd>
+                        <span style="color: #374151; font-weight: 500;">Fermer tous les panneaux</span>
                     </div>
-
-                    <div class="help-section">
-                        <h3><i class="fas fa-cookie-bite"></i> Gestion des Cookies</h3>
-                        <div class="help-features">
-                            <div class="help-feature">
-                                <div class="feature-icon"><i class="fas fa-toggle-on"></i></div>
-                                <div>
-                                    <strong>Contrôle total :</strong>
-                                    <p>Activez ou désactivez chaque type de cookie selon vos préférences</p>
-                                </div>
-                            </div>
-                            <div class="help-feature">
-                                <div class="feature-icon"><i class="fas fa-save"></i></div>
-                                <div>
-                                    <strong>Sauvegarde automatique :</strong>
-                                    <p>Vos préférences sont sauvegardées instantanément et appliquées</p>
-                                </div>
-                            </div>
-                            <div class="help-feature">
-                                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                                <div>
-                                    <strong>Transparence totale :</strong>
-                                    <p>Consultez l'usage détaillé de chaque type de cookie</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">H</kbd>
+                        <span style="color: #374151; font-weight: 500;">Afficher cette aide</span>
                     </div>
-
-                    <div class="help-section">
-                        <h3><i class="fas fa-mobile-alt"></i> Accessibilité</h3>
-                        <div class="help-accessibility">
-                            <div class="accessibility-item">
-                                <i class="fas fa-universal-access"></i>
-                                <span>Interface entièrement accessible au clavier</span>
-                            </div>
-                            <div class="accessibility-item">
-                                <i class="fas fa-eye"></i>
-                                <span>Support des lecteurs d'écran (ARIA)</span>
-                            </div>
-                            <div class="accessibility-item">
-                                <i class="fas fa-adjust"></i>
-                                <span>Mode sombre pour réduire la fatigue oculaire</span>
-                            </div>
-                            <div class="accessibility-item">
-                                <i class="fas fa-text-height"></i>
-                                <span>Texte redimensionnable sans perte de fonctionnalité</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="help-section">
-                        <h3><i class="fas fa-question-circle"></i> Besoin d'Aide ?</h3>
-                        <div class="help-contact">
-                            <div class="contact-option">
-                                <i class="fas fa-envelope"></i>
-                                <div>
-                                    <strong>Email Support :</strong>
-                                    <a href="mailto:legal@yakobot.com">legal@yakobot.com</a>
-                                </div>
-                            </div>
-                            <div class="contact-option">
-                                <i class="fab fa-discord"></i>
-                                <div>
-                                    <strong>Discord :</strong>
-                                    <a href="#">Serveur de support YAKO</a>
-                                </div>
-                            </div>
-                            <div class="contact-option">
-                                <i class="fas fa-book"></i>
-                                <div>
-                                    <strong>Documentation :</strong>
-                                    <a href="support.html">Centre d'aide complet</a>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">1-4</kbd>
+                        <span style="color: #374151; font-weight: 500;">Navigation entre les sections</span>
                     </div>
                 </div>
-
-                <div class="help-footer">
-                    <div class="help-stats">
-                        <div class="stat">
-                            <strong>4</strong>
-                            <span>Sections légales</span>
-                        </div>
-                        <div class="stat">
-                            <strong>3</strong>
-                            <span>Types de cookies</span>
-                        </div>
-                        <div class="stat">
-                            <strong>8</strong>
-                            <span>Raccourcis clavier</span>
-                        </div>
+                <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border-radius: 10px; border-left: 4px solid #10b981;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-lightbulb" style="color: #059669; font-size: 1.1rem;"></i>
+                        <strong style="color: #065f46;">Astuce :</strong>
                     </div>
-                    <p><i class="fas fa-info-circle"></i> Cette aide est toujours accessible en appuyant sur <kbd>H</kbd></p>
+                    <p style="color: #065f46; margin: 8px 0 0 0; font-size: 0.9rem;">Utilisez les flèches ← → pour naviguer entre les onglets focalisés !</p>
                 </div>
             </div>
         `;
 
-        // Créer et afficher la modal d'aide
-        this.showHelpModal(helpHTML);
-    }
-
-    showHelpModal(content) {
-        // Supprimer toute modal d'aide existante
-        const existingModal = document.querySelector('.help-modal-overlay');
-        if (existingModal) {
-            existingModal.remove();
-        }
-
-        const modalOverlay = document.createElement('div');
-        modalOverlay.className = 'help-modal-overlay';
-        modalOverlay.innerHTML = `
-            <div class="help-modal">
-                <button class="help-modal-close" onclick="this.closest('.help-modal-overlay').remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-                ${content}
-            </div>
-        `;
-
-        document.body.appendChild(modalOverlay);
-
-        // Fermeture au clic sur l'overlay
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                modalOverlay.remove();
-            }
-        });
-
-        // Fermeture par Échap
-        const handleEscape = (e) => {
-            if (e.key === 'Escape') {
-                modalOverlay.remove();
-                document.removeEventListener('keydown', handleEscape);
-            }
-        };
-        document.addEventListener('keydown', handleEscape);
-
-        // Animation d'entrée
-        setTimeout(() => {
-            modalOverlay.classList.add('show');
-        }, 10);
+        this.showNotification(helpHTML, 'info', 10000);
     }
 
     // ========== ANIMATIONS ==========
@@ -1282,8 +1189,9 @@ class YakoLegal {
         this.switchLegalSection(targetSection);
     }
 
-    // ========== NOTIFICATIONS ==========
-    showNotification(message, type = 'success', duration = 4000) {
+    // ========== NOTIFICATIONS (CORRIGÉES POUR VISIBILITÉ) ==========
+    showNotification(message, type = 'success', duration = 5000) {
+        // Supprimer les notifications existantes
         document.querySelectorAll('.notification').forEach(notif => notif.remove());
 
         const notification = document.createElement('div');
@@ -1297,65 +1205,57 @@ class YakoLegal {
         };
 
         notification.innerHTML = `
-            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                <i class="fas ${icons[type]}" style="font-size: 1.2rem; margin-top: 2px; flex-shrink: 0;"></i>
-                <div style="flex: 1; line-height: 1.4;">${message}</div>
-                <button onclick="this.parentElement.parentElement.remove()" 
-                        style="background: none; border: none; color: inherit; cursor: pointer; font-size: 1.2rem; margin-left: 10px; opacity: 0.7; flex-shrink: 0;"
-                        title="Fermer">×</button>
+            <div style="display: flex; align-items: flex-start; gap: 15px; width: 100%;">
+                <i class="fas ${icons[type] || icons.info}" style="margin-top: 3px; flex-shrink: 0; font-size: 1.4rem;"></i>
+                <div style="flex: 1; line-height: 1.5;">
+                    ${message}
+                </div>
+                <button onclick="this.closest('.notification').remove()" 
+                        style="background: none; border: none; color: inherit; cursor: pointer; font-size: 1.4rem; padding: 0; margin-left: 10px; opacity: 0.8; transition: opacity 0.3s ease; flex-shrink: 0;"
+                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"
+                        title="Fermer">
+                    ×
+                </button>
             </div>
         `;
 
-        // Positionner la notification au-dessus des boutons (mode sombre et cookies)
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            max-width: 450px;
-            padding: 20px;
-            border-radius: 12px;
-            font-weight: 500;
-            z-index: 10002;
-            animation: slideInFromTop 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            line-height: 1.4;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            border-left: 4px solid;
-        `;
-
-        // Couleurs selon le type
-        const colors = {
-            success: { bg: '#10b981', border: '#10b981' },
-            error: { bg: '#ef4444', border: '#ef4444' },
-            warning: { bg: '#f59e0b', border: '#f59e0b' },
-            info: { bg: '#3b82f6', border: '#3b82f6' }
-        };
-
-        notification.style.background = colors[type].bg;
-        notification.style.borderLeftColor = colors[type].border;
-        notification.style.color = 'white';
-
         document.body.appendChild(notification);
 
-        if (duration > 0) {
+        // Auto-suppression
+        const autoClose = setTimeout(() => {
+            if (notification && notification.parentNode) {
+                notification.style.animation = 'slideOutToRight 0.4s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) notification.remove();
+                }, 400);
+            }
+        }, duration);
+
+        // Supprimer au clic
+        notification.addEventListener('click', (e) => {
+            if (e.target === notification || e.target.closest('.notification') === notification) {
+                clearTimeout(autoClose);
+                notification.style.animation = 'slideOutToRight 0.4s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) notification.remove();
+                }, 400);
+            }
+        });
+
+        // Pause au survol
+        notification.addEventListener('mouseenter', () => {
+            clearTimeout(autoClose);
+        });
+
+        notification.addEventListener('mouseleave', () => {
             setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideOutToTop 0.3s ease';
+                if (notification && notification.parentNode) {
+                    notification.style.animation = 'slideOutToRight 0.4s ease';
                     setTimeout(() => {
                         if (notification.parentNode) notification.remove();
-                    }, 300);
+                    }, 400);
                 }
-            }, duration);
-        }
-
-        notification.addEventListener('click', () => {
-            notification.style.animation = 'slideOutToTop 0.3s ease';
-            setTimeout(() => {
-                if (notification.parentNode) notification.remove();
-            }, 300);
+            }, 2000);
         });
     }
 
@@ -1389,654 +1289,7 @@ class YakoLegal {
         const styles = document.createElement('style');
         styles.id = 'yakolegal-styles';
         styles.textContent = `
-            @keyframes slideInFromTop {
-                from { transform: translateY(-100%); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-            
-            @keyframes slideOutToTop {
-                from { transform: translateY(0); opacity: 1; }
-                to { transform: translateY(-100%); opacity: 0; }
-            }
-            
-            .animate-in {
-                animation: fadeInUp 0.6s ease forwards;
-            }
-            
-            @keyframes fadeInUp {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            
-            kbd {
-                background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px;
-                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); color: #334155;
-                display: inline-block; font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
-                font-size: 0.85em; font-weight: 700; line-height: 1; padding: 2px 4px; white-space: nowrap;
-            }
-            
-            body.dark-mode kbd {
-                background: #4b5563; border-color: #6b7280; color: #e5e7eb;
-            }
-
-            /* Styles pour les toggles de cookies */
-            .cookie-toggle input[type="checkbox"]:checked + .toggle-slider {
-                background: #7c2d12 !important;
-            }
-
-            body.dark-mode .cookie-toggle input[type="checkbox"]:checked + .toggle-slider {
-                background: #fbbf24 !important;
-            }
-
-            .cookie-toggle input[type="checkbox"] + .toggle-slider {
-                background: #d1d5db;
-                transition: background 0.3s ease;
-            }
-
-            body.dark-mode .cookie-toggle input[type="checkbox"] + .toggle-slider {
-                background: #6b7280;
-            }
-
-            .cookie-toggle input[type="checkbox"]:checked + .toggle-slider::before {
-                transform: translateX(26px);
-            }
-
-            /* Notification positionnée au-dessus des boutons */
-            .notification {
-                z-index: 10002 !important;
-            }
-
-            /* Modal d'aide - Style similaire à la page support */
-            .help-modal-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.7);
-                z-index: 10003;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                backdrop-filter: blur(5px);
-            }
-
-            .help-modal-overlay.show {
-                opacity: 1;
-            }
-
-            .help-modal {
-                background: white;
-                border-radius: 20px;
-                max-width: 900px;
-                max-height: 90vh;
-                overflow-y: auto;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                position: relative;
-                margin: 20px;
-                transform: scale(0.95);
-                transition: transform 0.3s ease;
-                border: 1px solid #e5e7eb;
-            }
-
-            .help-modal-overlay.show .help-modal {
-                transform: scale(1);
-            }
-
-            body.dark-mode .help-modal {
-                background: #1e293b;
-                border-color: #374151;
-                color: #e2e8f0;
-            }
-
-            .help-modal-close {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: #6b7280;
-                transition: all 0.3s ease;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1;
-            }
-
-            .help-modal-close:hover {
-                background: #f3f4f6;
-                color: #374151;
-            }
-
-            body.dark-mode .help-modal-close {
-                color: #94a3b8;
-            }
-
-            body.dark-mode .help-modal-close:hover {
-                background: #374151;
-                color: #e2e8f0;
-            }
-
-            .help-modal-content {
-                padding: 40px;
-            }
-
-            .help-header {
-                text-align: center;
-                margin-bottom: 40px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #e5e7eb;
-            }
-
-            body.dark-mode .help-header {
-                border-bottom-color: #374151;
-            }
-
-            .help-header h2 {
-                font-size: 2rem;
-                color: #7c2d12;
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 15px;
-            }
-
-            body.dark-mode .help-header h2 {
-                color: #fbbf24;
-            }
-
-            .help-header p {
-                color: #6b7280;
-                font-size: 1.1rem;
-            }
-
-            body.dark-mode .help-header p {
-                color: #94a3b8;
-            }
-
-            .help-sections {
-                display: grid;
-                gap: 30px;
-            }
-
-            .help-section {
-                background: #f9fafb;
-                border-radius: 15px;
-                padding: 25px;
-                border-left: 4px solid #7c2d12;
-            }
-
-            body.dark-mode .help-section {
-                background: #334155;
-                border-left-color: #fbbf24;
-            }
-
-            .help-section h3 {
-                color: #7c2d12;
-                font-size: 1.3rem;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-weight: 600;
-            }
-
-            body.dark-mode .help-section h3 {
-                color: #fbbf24;
-            }
-
-            .help-grid {
-                display: grid;
-                gap: 15px;
-            }
-
-            .help-item {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                padding: 15px;
-                background: white;
-                border-radius: 10px;
-                transition: all 0.3s ease;
-                border: 1px solid #e5e7eb;
-            }
-
-            .help-item:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            }
-
-            body.dark-mode .help-item {
-                background: #475569;
-                border-color: #64748b;
-            }
-
-            body.dark-mode .help-item:hover {
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            }
-
-            .help-item kbd {
-                flex-shrink: 0;
-                font-size: 0.9rem;
-                padding: 6px 10px;
-            }
-
-            .help-item span {
-                color: #4b5563;
-                font-weight: 500;
-            }
-
-            body.dark-mode .help-item span {
-                color: #cbd5e1;
-            }
-
-            .help-tips {
-                display: grid;
-                gap: 15px;
-            }
-
-            .help-tip {
-                display: flex;
-                gap: 15px;
-                padding: 20px;
-                background: white;
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;
-            }
-
-            body.dark-mode .help-tip {
-                background: #475569;
-                border-color: #64748b;
-            }
-
-            .help-tip i {
-                color: #7c2d12;
-                font-size: 1.2rem;
-                flex-shrink: 0;
-                margin-top: 2px;
-            }
-
-            body.dark-mode .help-tip i {
-                color: #fbbf24;
-            }
-
-            .help-tip strong {
-                color: #1f2937;
-                font-size: 1rem;
-                margin-bottom: 5px;
-                display: block;
-            }
-
-            body.dark-mode .help-tip strong {
-                color: #f1f5f9;
-            }
-
-            .help-tip p {
-                color: #6b7280;
-                margin: 0;
-                line-height: 1.5;
-            }
-
-            body.dark-mode .help-tip p {
-                color: #cbd5e1;
-            }
-
-            .help-features {
-                display: grid;
-                gap: 20px;
-            }
-
-            .help-feature {
-                display: flex;
-                gap: 20px;
-                padding: 20px;
-                background: white;
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;
-                align-items: flex-start;
-            }
-
-            body.dark-mode .help-feature {
-                background: #475569;
-                border-color: #64748b;
-            }
-
-            .feature-icon {
-                width: 50px;
-                height: 50px;
-                background: linear-gradient(135deg, #7c2d12, #92400e);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-            }
-
-            body.dark-mode .feature-icon {
-                background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            }
-
-            .feature-icon i {
-                color: white;
-                font-size: 1.2rem;
-            }
-
-            body.dark-mode .feature-icon i {
-                color: #1f2937;
-            }
-
-            .help-feature strong {
-                color: #1f2937;
-                font-size: 1.1rem;
-                margin-bottom: 5px;
-                display: block;
-            }
-
-            body.dark-mode .help-feature strong {
-                color: #f1f5f9;
-            }
-
-            .help-feature p {
-                color: #6b7280;
-                margin: 0;
-                line-height: 1.5;
-            }
-
-            body.dark-mode .help-feature p {
-                color: #cbd5e1;
-            }
-
-            .help-accessibility {
-                display: grid;
-                gap: 15px;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }
-
-            .accessibility-item {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 15px;
-                background: white;
-                border-radius: 10px;
-                border: 1px solid #e5e7eb;
-            }
-
-            body.dark-mode .accessibility-item {
-                background: #475569;
-                border-color: #64748b;
-            }
-
-            .accessibility-item i {
-                color: #7c2d12;
-                font-size: 1.1rem;
-                flex-shrink: 0;
-            }
-
-            body.dark-mode .accessibility-item i {
-                color: #fbbf24;
-            }
-
-            .accessibility-item span {
-                color: #4b5563;
-                font-weight: 500;
-                font-size: 0.9rem;
-            }
-
-            body.dark-mode .accessibility-item span {
-                color: #cbd5e1;
-            }
-
-            .help-contact {
-                display: grid;
-                gap: 15px;
-            }
-
-            .contact-option {
-                display: flex;
-                gap: 15px;
-                padding: 20px;
-                background: white;
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;
-                align-items: center;
-            }
-
-            body.dark-mode .contact-option {
-                background: #475569;
-                border-color: #64748b;
-            }
-
-            .contact-option i {
-                color: #7c2d12;
-                font-size: 1.3rem;
-                flex-shrink: 0;
-            }
-
-            body.dark-mode .contact-option i {
-                color: #fbbf24;
-            }
-
-            .contact-option strong {
-                color: #1f2937;
-                margin-bottom: 3px;
-                display: block;
-            }
-
-            body.dark-mode .contact-option strong {
-                color: #f1f5f9;
-            }
-
-            .contact-option a {
-                color: #7c2d12;
-                text-decoration: none;
-                font-weight: 500;
-                transition: color 0.3s ease;
-            }
-
-            .contact-option a:hover {
-                color: #92400e;
-                text-decoration: underline;
-            }
-
-            body.dark-mode .contact-option a {
-                color: #fbbf24;
-            }
-
-            body.dark-mode .contact-option a:hover {
-                color: #f59e0b;
-            }
-
-            .help-footer {
-                margin-top: 40px;
-                padding-top: 30px;
-                border-top: 2px solid #e5e7eb;
-                text-align: center;
-            }
-
-            body.dark-mode .help-footer {
-                border-top-color: #374151;
-            }
-
-            .help-stats {
-                display: flex;
-                justify-content: center;
-                gap: 40px;
-                margin-bottom: 20px;
-            }
-
-            .stat {
-                text-align: center;
-            }
-
-            .stat strong {
-                display: block;
-                font-size: 2rem;
-                color: #7c2d12;
-                font-weight: 700;
-                line-height: 1;
-            }
-
-            body.dark-mode .stat strong {
-                color: #fbbf24;
-            }
-
-            .stat span {
-                color: #6b7280;
-                font-size: 0.9rem;
-                font-weight: 500;
-            }
-
-            body.dark-mode .stat span {
-                color: #94a3b8;
-            }
-
-            .help-footer p {
-                color: #6b7280;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                font-size: 0.95rem;
-            }
-
-            body.dark-mode .help-footer p {
-                color: #94a3b8;
-            }
-
-            .help-footer i {
-                color: #7c2d12;
-            }
-
-            body.dark-mode .help-footer i {
-                color: #fbbf24;
-            }
-
-            /* Badge de statut des cookies responsive */
-            @media (max-width: 768px) {
-                .cookie-status-badge {
-                    bottom: 90px !important;
-                    right: 15px !important;
-                    font-size: 0.7rem !important;
-                    padding: 6px 10px !important;
-                }
-                
-                .notification {
-                    top: 15px !important;
-                    right: 15px !important;
-                    left: 15px !important;
-                    max-width: none !important;
-                }
-                
-                .cookie-modal {
-                    bottom: 15px !important;
-                    right: 15px !important;
-                    left: 15px !important;
-                    width: auto !important;
-                    max-width: none !important;
-                }
-
-                .help-modal {
-                    margin: 10px;
-                    max-height: 95vh;
-                }
-
-                .help-modal-content {
-                    padding: 20px;
-                }
-
-                .help-sections {
-                    gap: 20px;
-                }
-
-                .help-section {
-                    padding: 20px;
-                }
-
-                .help-stats {
-                    gap: 20px;
-                }
-
-                .help-accessibility {
-                    grid-template-columns: 1fr;
-                }
-
-                .help-item {
-                    flex-direction: column;
-                    text-align: center;
-                    gap: 10px;
-                }
-            }
-
-            /* Amélioration de l'accessibilité */
-            .cookie-toggle input[type="checkbox"]:focus + .toggle-slider {
-                outline: 2px solid #7c2d12;
-                outline-offset: 2px;
-            }
-
-            body.dark-mode .cookie-toggle input[type="checkbox"]:focus + .toggle-slider {
-                outline-color: #fbbf24;
-            }
-
-            /* Animation des toggles */
-            .toggle-slider::before {
-                transition: transform 0.3s ease, background 0.3s ease;
-            }
-
-            /* Indication visuelle des cookies activés/désactivés */
-            .cookie-option {
-                transition: all 0.3s ease;
-            }
-
-            .cookie-option:has(input:checked) {
-                background: rgba(16, 185, 129, 0.05);
-                border-left-color: #10b981;
-            }
-
-            body.dark-mode .cookie-option:has(input:checked) {
-                background: rgba(251, 191, 36, 0.05);
-                border-left-color: #fbbf24;
-            }
-
-            /* Scrollbar personnalisée pour la modal d'aide */
-            .help-modal::-webkit-scrollbar {
-                width: 8px;
-            }
-
-            .help-modal::-webkit-scrollbar-track {
-                background: #f1f5f9;
-                border-radius: 4px;
-            }
-
-            .help-modal::-webkit-scrollbar-thumb {
-                background: #cbd5e1;
-                border-radius: 4px;
-            }
-
-            .help-modal::-webkit-scrollbar-thumb:hover {
-                background: #94a3b8;
-            }
-
-            body.dark-mode .help-modal::-webkit-scrollbar-track {
-                background: #374151;
-            }
-
-            body.dark-mode .help-modal::-webkit-scrollbar-thumb {
-                background: #64748b;
-            }
-
-            body.dark-mode .help-modal::-webkit-scrollbar-thumb:hover {
-                background: #94a3b8;
-            }
+            /* Styles déjà définis dans le CSS - pas besoin de les redéfinir ici */
         `;
         document.head.appendChild(styles);
     }
