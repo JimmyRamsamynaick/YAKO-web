@@ -21,13 +21,12 @@ class YakoLegal {
 
         this.setupMobileMenu();
         this.setupLegalTabs();
-        this.setupScrollNavigation();
+        this.setupScrollToTop();
         this.setupCookies();
         this.setupSearch();
         this.setupKeyboardShortcuts();
         this.setupAnimations();
         this.setupNavbarEffects();
-        this.setupScrollToTop();
         this.loadInitialState();
 
         console.log('✅ YAKO Legal - Toutes les fonctionnalités initialisées');
@@ -233,70 +232,6 @@ class YakoLegal {
         this.announceTabChange(targetSection);
     }
 
-    // ========== NAVIGATION AU SCROLL (CORRECTION DU BUG) ==========
-    setupScrollNavigation() {
-        let ticking = false;
-        let scrollThreshold = 200;
-
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    this.handleLegalNavScroll(scrollThreshold);
-                    this.handleNavbarScroll();
-                    this.updateScrollToTopButton();
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
-
-        // Empêcher le masquage au survol
-        const legalNav = document.querySelector('.legal-nav');
-        if (legalNav) {
-            legalNav.addEventListener('mouseenter', () => {
-                this.showLegalNav();
-            });
-        }
-    }
-
-    handleLegalNavScroll(threshold) {
-        const currentScrollY = window.scrollY;
-        const scrollDifference = Math.abs(currentScrollY - this.lastScrollY);
-
-        // Réduire la sensibilité
-        if (scrollDifference < 10) return;
-
-        const legalNav = document.querySelector('.legal-nav');
-        if (!legalNav) return;
-
-        // Masquer seulement si on scroll vers le bas ET qu'on dépasse le seuil
-        if (currentScrollY > this.lastScrollY && currentScrollY > threshold) {
-            this.hideLegalNav();
-        }
-        // Afficher si on scroll vers le haut OU si on est en haut de page
-        else if (currentScrollY < this.lastScrollY || currentScrollY <= 100) {
-            this.showLegalNav();
-        }
-
-        this.lastScrollY = currentScrollY;
-    }
-
-    hideLegalNav() {
-        const legalNav = document.querySelector('.legal-nav');
-        if (this.isNavVisible && legalNav) {
-            legalNav.classList.add('hidden');
-            this.isNavVisible = false;
-        }
-    }
-
-    showLegalNav() {
-        const legalNav = document.querySelector('.legal-nav');
-        if (!this.isNavVisible && legalNav) {
-            legalNav.classList.remove('hidden');
-            this.isNavVisible = true;
-        }
-    }
-
     // ========== BOUTON RETOUR EN HAUT ==========
     setupScrollToTop() {
         const scrollToTopBtn = document.createElement('button');
@@ -313,20 +248,18 @@ class YakoLegal {
         });
 
         document.body.appendChild(scrollToTopBtn);
-    }
 
-    updateScrollToTopButton() {
-        const scrollBtn = document.querySelector('.scroll-to-top');
-        if (scrollBtn) {
+        // Gestion de l'affichage au scroll
+        window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
-                scrollBtn.classList.add('visible');
+                scrollToTopBtn.classList.add('visible');
             } else {
-                scrollBtn.classList.remove('visible');
+                scrollToTopBtn.classList.remove('visible');
             }
-        }
+        });
     }
 
-    // ========== GESTION DES COOKIES (CORRECTION DES TOGGLES) ==========
+    // ========== GESTION DES COOKIES (CORRIGÉE) ==========
     setupCookies() {
         this.loadCookiePreferences();
         this.bindCookieEvents();
@@ -374,24 +307,19 @@ class YakoLegal {
             });
         }
 
-        // CORRECTION: Gérer les clics sur les labels ET les toggles
+        // CORRECTION: Gérer les clics sur les éléments toggle
         document.addEventListener('click', (e) => {
-            // Clic sur le slider
-            if (e.target.matches('.toggle-slider')) {
-                e.preventDefault();
-                const checkbox = e.target.previousElementSibling;
-                if (checkbox && checkbox.type === 'checkbox' && !checkbox.disabled) {
-                    checkbox.checked = !checkbox.checked;
-                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            }
-            // Clic sur le label
-            else if (e.target.closest('.cookie-toggle label') && !e.target.matches('input')) {
-                e.preventDefault();
-                const label = e.target.closest('.cookie-toggle label');
-                const toggle = label.closest('.cookie-toggle');
-                const checkbox = toggle.querySelector('input[type="checkbox"]');
+            const cookieToggle = e.target.closest('.cookie-toggle');
+            if (cookieToggle) {
+                const checkbox = cookieToggle.querySelector('input[type="checkbox"]');
                 if (checkbox && !checkbox.disabled) {
+                    // Si on clique sur le checkbox, ne pas faire de double toggle
+                    if (e.target === checkbox) {
+                        return;
+                    }
+
+                    // Sinon, toggle manuellement
+                    e.preventDefault();
                     checkbox.checked = !checkbox.checked;
                     checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                 }
@@ -556,11 +484,11 @@ class YakoLegal {
         statusBadge.addEventListener('click', () => this.showCookieModal());
         statusBadge.addEventListener('mouseenter', () => {
             statusBadge.style.transform = 'translateY(-3px) scale(1.05)';
-            statusBadge.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.35)';
+            statusBadge.style.boxShadow = '0 12px 35px rgba(0, 0, 0, 0.4)';
         });
         statusBadge.addEventListener('mouseleave', () => {
             statusBadge.style.transform = 'translateY(0) scale(1)';
-            statusBadge.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.25)';
+            statusBadge.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
         });
 
         document.body.appendChild(statusBadge);
@@ -578,7 +506,7 @@ class YakoLegal {
         const enabledCount = Object.values(preferences).filter(Boolean).length;
         const totalCount = Object.keys(preferences).length;
 
-        statusBadge.innerHTML = `<i class="fas fa-cookie-bite" style="margin-right: 8px;"></i>${enabledCount}/${totalCount}`;
+        statusBadge.innerHTML = `<i class="fas fa-cookie-bite"></i>${enabledCount}/${totalCount}`;
         statusBadge.title = `${enabledCount} types de cookies activés sur ${totalCount} - Cliquer pour gérer`;
 
         this.updateBadgeColor(statusBadge, enabledCount, totalCount);
@@ -691,35 +619,6 @@ class YakoLegal {
             toggle.addEventListener('change', () => {
                 this.updateToggleVisual(toggle);
                 this.synchronizeCorrespondingToggle(toggle);
-            });
-        });
-
-        // Gérer les clics sur les sliders dans la modal
-        modal.querySelectorAll('.toggle-slider').forEach(slider => {
-            slider.addEventListener('click', (e) => {
-                e.preventDefault();
-                const checkbox = slider.previousElementSibling;
-                if (checkbox && checkbox.type === 'checkbox' && !checkbox.disabled) {
-                    checkbox.checked = !checkbox.checked;
-                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            });
-        });
-
-        // Gérer les clics sur les labels dans la modal
-        modal.querySelectorAll('.cookie-option label').forEach(label => {
-            label.addEventListener('click', (e) => {
-                if (e.target.tagName === 'LABEL') {
-                    e.preventDefault();
-                    const forId = label.getAttribute('for');
-                    if (forId) {
-                        const checkbox = document.getElementById(forId);
-                        if (checkbox && !checkbox.disabled) {
-                            checkbox.checked = !checkbox.checked;
-                            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                    }
-                }
             });
         });
 
@@ -981,7 +880,7 @@ class YakoLegal {
         this.searchResults = [];
     }
 
-    // ========== RACCOURCIS CLAVIER (CORRECTION AIDE) ==========
+    // ========== RACCOURCIS CLAVIER ==========
     setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => this.handleGlobalKeydown(e));
     }
@@ -1189,7 +1088,7 @@ class YakoLegal {
         this.switchLegalSection(targetSection);
     }
 
-    // ========== NOTIFICATIONS (CORRIGÉES POUR VISIBILITÉ) ==========
+    // ========== NOTIFICATIONS - STYLE SUPPORT ==========
     showNotification(message, type = 'success', duration = 5000) {
         // Supprimer les notifications existantes
         document.querySelectorAll('.notification').forEach(notif => notif.remove());
