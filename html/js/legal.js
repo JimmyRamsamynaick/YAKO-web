@@ -1,4 +1,4 @@
-// YAKO Legal - Version corrigée complète
+// YAKO Legal - Version corrigée complète avec navigation sticky et cookie badge fixé
 class YakoLegal {
     constructor() {
         this.currentSection = 'mentions';
@@ -27,10 +27,51 @@ class YakoLegal {
         this.setupKeyboardShortcuts();
         this.setupAnimations();
         this.setupNavbarEffects();
+        this.setupStickyNavigation();
         this.loadInitialState();
 
         console.log('✅ YAKO Legal - Toutes les fonctionnalités initialisées');
         this.addStyles();
+    }
+
+    // ========== NAVIGATION STICKY ==========
+    setupStickyNavigation() {
+        const legalNav = document.querySelector('.legal-nav');
+        if (!legalNav) return;
+
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+
+        function updateNavigation() {
+            const scrollY = window.scrollY;
+            const scrollDirection = scrollY > lastScrollY ? 'down' : 'up';
+
+            if (scrollY > 200) {
+                if (scrollDirection === 'down') {
+                    legalNav.style.transform = 'translateY(-100%)';
+                    legalNav.style.opacity = '0';
+                } else {
+                    legalNav.style.transform = 'translateY(0)';
+                    legalNav.style.opacity = '1';
+                }
+            } else {
+                legalNav.style.transform = 'translateY(0)';
+                legalNav.style.opacity = '1';
+            }
+
+            lastScrollY = scrollY;
+            ticking = false;
+        }
+
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(updateNavigation);
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', requestTick);
+        console.log('✅ Navigation sticky initialisée');
     }
 
     // ========== MENU MOBILE ==========
@@ -249,7 +290,6 @@ class YakoLegal {
 
         document.body.appendChild(scrollToTopBtn);
 
-        // Gestion de l'affichage au scroll
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
                 scrollToTopBtn.classList.add('visible');
@@ -259,7 +299,7 @@ class YakoLegal {
         });
     }
 
-    // ========== GESTION DES COOKIES (CORRIGÉE) ==========
+    // ========== GESTION DES COOKIES (CORRIGÉE POUR SAUVEGARDE) ==========
     setupCookies() {
         this.loadCookiePreferences();
         this.bindCookieEvents();
@@ -269,7 +309,23 @@ class YakoLegal {
 
     loadCookiePreferences() {
         console.log('🍪 Chargement des préférences de cookies');
-        const preferences = JSON.parse(localStorage.getItem('cookiePreferences') || JSON.stringify(this.defaultCookieSettings));
+
+        // CORRECTION: Charger depuis localStorage ou utiliser les valeurs par défaut
+        let preferences;
+        const saved = localStorage.getItem('cookiePreferences');
+
+        if (saved) {
+            try {
+                preferences = JSON.parse(saved);
+                console.log('✅ Préférences chargées depuis localStorage:', preferences);
+            } catch (e) {
+                console.warn('⚠️ Erreur parsing localStorage, utilisation des valeurs par défaut');
+                preferences = { ...this.defaultCookieSettings };
+            }
+        } else {
+            console.log('📝 Aucune préférence sauvegardée, utilisation des valeurs par défaut');
+            preferences = { ...this.defaultCookieSettings };
+        }
 
         this.updateCookieToggles(preferences);
         this.applyCookiePreferences(preferences);
@@ -307,18 +363,14 @@ class YakoLegal {
             });
         }
 
-        // CORRECTION: Gérer les clics sur les éléments toggle
         document.addEventListener('click', (e) => {
             const cookieToggle = e.target.closest('.cookie-toggle');
             if (cookieToggle) {
                 const checkbox = cookieToggle.querySelector('input[type="checkbox"]');
                 if (checkbox && !checkbox.disabled) {
-                    // Si on clique sur le checkbox, ne pas faire de double toggle
                     if (e.target === checkbox) {
                         return;
                     }
-
-                    // Sinon, toggle manuellement
                     e.preventDefault();
                     checkbox.checked = !checkbox.checked;
                     checkbox.dispatchEvent(new Event('change', { bubbles: true }));
@@ -326,7 +378,6 @@ class YakoLegal {
             }
         });
 
-        // Gérer les changements d'état des checkboxes
         document.addEventListener('change', (e) => {
             if (e.target.matches('.cookie-toggle input[type="checkbox"]:not([disabled])')) {
                 this.handleToggleChange(e.target);
@@ -336,7 +387,11 @@ class YakoLegal {
 
     saveCookiePreferences() {
         const preferences = this.collectCookiePreferences();
+
+        // CORRECTION: Sauvegarder immédiatement
         localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+        console.log('💾 Préférences sauvegardées:', preferences);
+
         this.applyCookiePreferences(preferences);
         this.updateCookieStatusBadge(preferences);
         this.showNotification('✅ Vos préférences de cookies ont été sauvegardées !', 'success');
@@ -360,7 +415,10 @@ class YakoLegal {
         this.updateCookieToggles(this.defaultCookieSettings);
         this.synchronizeAllToggles();
 
-        localStorage.removeItem('cookiePreferences');
+        // CORRECTION: Réinitialiser le localStorage aussi
+        localStorage.setItem('cookiePreferences', JSON.stringify(this.defaultCookieSettings));
+        console.log('🔄 Préférences réinitialisées');
+
         this.applyCookiePreferences(this.defaultCookieSettings);
         this.updateCookieStatusBadge(this.defaultCookieSettings);
         this.showNotification('🔄 Préférences de cookies réinitialisées aux valeurs par défaut', 'info');
@@ -381,7 +439,6 @@ class YakoLegal {
     handleToggleChange(toggle) {
         this.updateToggleVisual(toggle);
 
-        // Animation visuelle du changement
         const label = toggle.closest('.cookie-toggle').querySelector('label');
         if (label) {
             const originalColor = label.style.color;
@@ -391,10 +448,11 @@ class YakoLegal {
             }, 500);
         }
 
-        // Sauvegarder automatiquement les préférences
+        // CORRECTION: Sauvegarder automatiquement à chaque changement
         setTimeout(() => {
             const preferences = this.collectCookiePreferences();
             localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+            console.log('🔄 Auto-sauvegarde:', preferences);
             this.applyCookiePreferences(preferences);
             this.updateCookieStatusBadge(preferences);
             this.synchronizeCorrespondingToggle(toggle);
@@ -472,7 +530,6 @@ class YakoLegal {
     }
 
     createCookieStatusBadge() {
-        // Supprimer le badge existant
         const existingBadge = document.querySelector('.cookie-status-badge');
         if (existingBadge) {
             existingBadge.remove();
@@ -480,6 +537,8 @@ class YakoLegal {
 
         const statusBadge = document.createElement('div');
         statusBadge.className = 'cookie-status-badge';
+        statusBadge.innerHTML = '<i class="fas fa-cookie-bite"></i> <span>0/3</span>';
+        statusBadge.title = 'Cliquer pour gérer les cookies';
 
         statusBadge.addEventListener('click', () => this.showCookieModal());
         statusBadge.addEventListener('mouseenter', () => {
@@ -492,7 +551,6 @@ class YakoLegal {
         });
 
         document.body.appendChild(statusBadge);
-
         return statusBadge;
     }
 
@@ -506,7 +564,7 @@ class YakoLegal {
         const enabledCount = Object.values(preferences).filter(Boolean).length;
         const totalCount = Object.keys(preferences).length;
 
-        statusBadge.innerHTML = `<i class="fas fa-cookie-bite"></i>${enabledCount}/${totalCount}`;
+        statusBadge.innerHTML = `<i class="fas fa-cookie-bite"></i> <span>${enabledCount}/${totalCount}</span>`;
         statusBadge.title = `${enabledCount} types de cookies activés sur ${totalCount} - Cliquer pour gérer`;
 
         this.updateBadgeColor(statusBadge, enabledCount, totalCount);
@@ -594,7 +652,19 @@ class YakoLegal {
     }
 
     loadModalPreferences(modal) {
-        const preferences = JSON.parse(localStorage.getItem('cookiePreferences') || JSON.stringify(this.defaultCookieSettings));
+        // CORRECTION: Charger les vraies préférences sauvegardées
+        const saved = localStorage.getItem('cookiePreferences');
+        let preferences;
+
+        if (saved) {
+            try {
+                preferences = JSON.parse(saved);
+            } catch (e) {
+                preferences = { ...this.defaultCookieSettings };
+            }
+        } else {
+            preferences = { ...this.defaultCookieSettings };
+        }
 
         const analyticsInput = document.getElementById('modal-analytics-cookies');
         const performanceInput = document.getElementById('modal-performance-cookies');
@@ -622,7 +692,6 @@ class YakoLegal {
             });
         });
 
-        // Fermeture par Échap
         const handleEscape = (e) => {
             if (e.key === 'Escape') {
                 this.hideCookieModal();
@@ -650,6 +719,8 @@ class YakoLegal {
         };
 
         localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+        console.log('💾 Préférences modal sauvegardées:', preferences);
+
         this.applyCookiePreferences(preferences);
         this.updateCookieStatusBadge(preferences);
         this.updateMainToggles(preferences);
@@ -939,32 +1010,40 @@ class YakoLegal {
 
     showKeyboardHelp() {
         const helpHTML = `
-            <div style="max-width: 500px; background: white; border-radius: 15px; padding: 25px; color: #333; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-                <h3 style="margin-bottom: 25px; color: #7c2d12; display: flex; align-items: center; gap: 12px; font-size: 1.3rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
-                    <i class="fas fa-keyboard" style="color: #fbbf24;"></i> Raccourcis clavier
+            <div style="max-width: 600px; background: white; border-radius: 20px; padding: 30px; color: #333; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;">
+                <button onclick="this.parentElement.remove()" 
+                        style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.3s ease;"
+                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
+                    ×
+                </button>
+                
+                <h3 style="margin-bottom: 25px; color: #7c2d12; display: flex; align-items: center; gap: 12px; font-size: 1.4rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
+                    <i class="fas fa-keyboard" style="color: #fbbf24; font-size: 1.5rem;"></i> Raccourcis clavier
                 </h3>
+                
                 <div style="display: grid; gap: 15px;">
                     <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">Ctrl+F</kbd>
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Ctrl+F</kbd>
                         <span style="color: #374151; font-weight: 500;">Rechercher dans les documents</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">Ctrl+D</kbd>
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Ctrl+D</kbd>
                         <span style="color: #374151; font-weight: 500;">Basculer le mode sombre/clair</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">Échap</kbd>
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Échap</kbd>
                         <span style="color: #374151; font-weight: 500;">Fermer tous les panneaux</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">H</kbd>
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">H</kbd>
                         <span style="color: #374151; font-weight: 500;">Afficher cette aide</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 60px; text-align: center;">1-4</kbd>
+                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">1-4</kbd>
                         <span style="color: #374151; font-weight: 500;">Navigation entre les sections</span>
                     </div>
                 </div>
+                
                 <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border-radius: 10px; border-left: 4px solid #10b981;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <i class="fas fa-lightbulb" style="color: #059669; font-size: 1.1rem;"></i>
@@ -975,7 +1054,7 @@ class YakoLegal {
             </div>
         `;
 
-        this.showNotification(helpHTML, 'info', 10000);
+        this.showNotification(helpHTML, 'info', 15000);
     }
 
     // ========== ANIMATIONS ==========
@@ -1090,7 +1169,6 @@ class YakoLegal {
 
     // ========== NOTIFICATIONS - STYLE SUPPORT ==========
     showNotification(message, type = 'success', duration = 5000) {
-        // Supprimer les notifications existantes
         document.querySelectorAll('.notification').forEach(notif => notif.remove());
 
         const notification = document.createElement('div');
@@ -1120,7 +1198,6 @@ class YakoLegal {
 
         document.body.appendChild(notification);
 
-        // Auto-suppression
         const autoClose = setTimeout(() => {
             if (notification && notification.parentNode) {
                 notification.style.animation = 'slideOutToRight 0.4s ease';
@@ -1130,7 +1207,6 @@ class YakoLegal {
             }
         }, duration);
 
-        // Supprimer au clic
         notification.addEventListener('click', (e) => {
             if (e.target === notification || e.target.closest('.notification') === notification) {
                 clearTimeout(autoClose);
@@ -1141,7 +1217,6 @@ class YakoLegal {
             }
         });
 
-        // Pause au survol
         notification.addEventListener('mouseenter', () => {
             clearTimeout(autoClose);
         });
@@ -1188,7 +1263,26 @@ class YakoLegal {
         const styles = document.createElement('style');
         styles.id = 'yakolegal-styles';
         styles.textContent = `
-            /* Styles déjà définis dans le CSS - pas besoin de les redéfinir ici */
+            /* Styles pour la navigation sticky */
+            .legal-nav {
+                transition: transform 0.3s ease, opacity 0.3s ease !important;
+            }
+            
+            /* Amélioration du badge cookies */
+            .cookie-status-badge {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+            }
+            
+            .cookie-status-badge i {
+                font-size: 1rem !important;
+            }
+            
+            .cookie-status-badge span {
+                font-weight: 600 !important;
+                font-size: 0.9rem !important;
+            }
         `;
         document.head.appendChild(styles);
     }

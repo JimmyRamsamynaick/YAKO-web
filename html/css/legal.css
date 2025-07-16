@@ -136,7 +136,7 @@ body {
     opacity: 0.9;
 }
 
-/* Legal Navigation - RESTE EN HAUT */
+/* Legal Navigation - NAVIGATION STICKY CORRIGÉE */
 .legal-nav {
     padding: 40px 0;
     background: white;
@@ -144,7 +144,7 @@ body {
     position: sticky;
     top: 70px;
     z-index: 100;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .legal-tabs {
@@ -813,7 +813,7 @@ body.dark-mode .summary-contact a {
     color: #fbbf24;
 }
 
-/* Cookie Status Badge - VISIBLE DÈS L'ARRIVÉE EN HAUT DU BOUTON DARK MODE */
+/* Cookie Status Badge - CORRIGÉ ET VISIBLE */
 .cookie-status-badge {
     position: fixed;
     bottom: 90px; /* Au-dessus du bouton dark mode */
@@ -834,9 +834,9 @@ body.dark-mode .summary-contact a {
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
 }
 
 .cookie-status-badge:hover {
@@ -845,7 +845,12 @@ body.dark-mode .summary-contact a {
 }
 
 .cookie-status-badge i {
-    font-size: 1rem;
+    font-size: 1rem !important;
+}
+
+.cookie-status-badge span {
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
 }
 
 /* Scroll to Top Button - BAS GAUCHE */
