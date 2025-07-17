@@ -30,6 +30,13 @@ class YakoLegal {
         this.setupStickyNavigation();
         this.loadInitialState();
 
+        // CORRECTION: Vérifier et afficher l'état des cookies au démarrage
+        setTimeout(() => {
+            const preferences = this.getSavedCookiePreferences();
+            console.log('🔍 Vérification finale des préférences cookies au démarrage:', preferences);
+            this.updateCookieStatusBadge(preferences);
+        }, 200);
+
         console.log('✅ YAKO Legal - Toutes les fonctionnalités initialisées');
         this.addStyles();
     }
@@ -305,31 +312,41 @@ class YakoLegal {
         this.bindCookieEvents();
         this.setupCookieModal();
         this.createCookieStatusBadge();
+
+        // CORRECTION: Mettre à jour le badge immédiatement après création
+        setTimeout(() => {
+            const savedPreferences = this.getSavedCookiePreferences();
+            this.updateCookieStatusBadge(savedPreferences);
+        }, 100);
     }
 
     loadCookiePreferences() {
         console.log('🍪 Chargement des préférences de cookies');
 
-        // CORRECTION: Charger depuis localStorage ou utiliser les valeurs par défaut
-        let preferences;
+        const preferences = this.getSavedCookiePreferences();
+        console.log('✅ Préférences chargées:', preferences);
+
+        this.updateCookieToggles(preferences);
+        this.applyCookiePreferences(preferences);
+
+        // CORRECTION: Pas besoin d'appeler updateCookieStatusBadge ici car le badge n'existe pas encore
+    }
+
+    // NOUVELLE FONCTION: Récupérer les préférences sauvegardées
+    getSavedCookiePreferences() {
         const saved = localStorage.getItem('cookiePreferences');
 
         if (saved) {
             try {
-                preferences = JSON.parse(saved);
-                console.log('✅ Préférences chargées depuis localStorage:', preferences);
+                return JSON.parse(saved);
             } catch (e) {
                 console.warn('⚠️ Erreur parsing localStorage, utilisation des valeurs par défaut');
-                preferences = { ...this.defaultCookieSettings };
+                return { ...this.defaultCookieSettings };
             }
         } else {
             console.log('📝 Aucune préférence sauvegardée, utilisation des valeurs par défaut');
-            preferences = { ...this.defaultCookieSettings };
+            return { ...this.defaultCookieSettings };
         }
-
-        this.updateCookieToggles(preferences);
-        this.applyCookiePreferences(preferences);
-        this.updateCookieStatusBadge(preferences);
     }
 
     updateCookieToggles(preferences) {
@@ -551,6 +568,11 @@ class YakoLegal {
         });
 
         document.body.appendChild(statusBadge);
+
+        // CORRECTION: Mettre à jour immédiatement avec les préférences sauvegardées
+        const savedPreferences = this.getSavedCookiePreferences();
+        this.updateCookieStatusBadge(savedPreferences);
+
         return statusBadge;
     }
 
@@ -652,19 +674,8 @@ class YakoLegal {
     }
 
     loadModalPreferences(modal) {
-        // CORRECTION: Charger les vraies préférences sauvegardées
-        const saved = localStorage.getItem('cookiePreferences');
-        let preferences;
-
-        if (saved) {
-            try {
-                preferences = JSON.parse(saved);
-            } catch (e) {
-                preferences = { ...this.defaultCookieSettings };
-            }
-        } else {
-            preferences = { ...this.defaultCookieSettings };
-        }
+        // CORRECTION: Utiliser la nouvelle fonction centralisée
+        const preferences = this.getSavedCookiePreferences();
 
         const analyticsInput = document.getElementById('modal-analytics-cookies');
         const performanceInput = document.getElementById('modal-performance-cookies');
@@ -675,11 +686,11 @@ class YakoLegal {
             this.updateToggleVisual(analyticsInput);
         }
         if (performanceInput) {
-            performanceInput.checked = preferences.performance || false;
+            performanceInput.checked = preferences.performance !== undefined ? preferences.performance : true;
             this.updateToggleVisual(performanceInput);
         }
         if (preferencesInput) {
-            preferencesInput.checked = preferences.preferences || false;
+            preferencesInput.checked = preferences.preferences !== undefined ? preferences.preferences : true;
             this.updateToggleVisual(preferencesInput);
         }
     }
@@ -1010,51 +1021,23 @@ class YakoLegal {
 
     showKeyboardHelp() {
         const helpHTML = `
-            <div style="max-width: 600px; background: white; border-radius: 20px; padding: 30px; color: #333; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;">
-                <button onclick="this.parentElement.remove()" 
-                        style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.3s ease;"
-                        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">
-                    ×
-                </button>
-                
-                <h3 style="margin-bottom: 25px; color: #7c2d12; display: flex; align-items: center; gap: 12px; font-size: 1.4rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
-                    <i class="fas fa-keyboard" style="color: #fbbf24; font-size: 1.5rem;"></i> Raccourcis clavier
-                </h3>
-                
-                <div style="display: grid; gap: 15px;">
-                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Ctrl+F</kbd>
-                        <span style="color: #374151; font-weight: 500;">Rechercher dans les documents</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Ctrl+D</kbd>
-                        <span style="color: #374151; font-weight: 500;">Basculer le mode sombre/clair</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Échap</kbd>
-                        <span style="color: #374151; font-weight: 500;">Fermer tous les panneaux</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">H</kbd>
-                        <span style="color: #374151; font-weight: 500;">Afficher cette aide</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: #f9fafb; border-radius: 10px; border-left: 4px solid #7c2d12;">
-                        <kbd style="background: #7c2d12; color: white; padding: 8px 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; min-width: 70px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">1-4</kbd>
-                        <span style="color: #374151; font-weight: 500;">Navigation entre les sections</span>
-                    </div>
+            <div style="max-width: 500px; text-align: left;">
+                <h3 style="margin-bottom: 20px; color: #7c2d12;">⌨️ Raccourcis clavier</h3>
+                <div style="display: grid; gap: 10px; font-size: 0.9rem;">
+                    <div><kbd>Ctrl+F</kbd> - <span style="color: #7c2d12; font-weight: 500;">Rechercher dans les documents</span></div>
+                    <div><kbd>Ctrl+D</kbd> - <span style="color: #7c2d12; font-weight: 500;">Basculer le mode sombre/clair</span></div>
+                    <div><kbd>Échap</kbd> - <span style="color: #7c2d12; font-weight: 500;">Fermer tous les panneaux</span></div>
+                    <div><kbd>H</kbd> - <span style="color: #7c2d12; font-weight: 500;">Afficher cette aide</span></div>
+                    <div><kbd>1-4</kbd> - <span style="color: #7c2d12; font-weight: 500;">Navigation entre les sections</span></div>
+                    <div><kbd>←→</kbd> - <span style="color: #7c2d12; font-weight: 500;">Naviguer entre onglets (focus clavier)</span></div>
                 </div>
-                
-                <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border-radius: 10px; border-left: 4px solid #10b981;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-lightbulb" style="color: #059669; font-size: 1.1rem;"></i>
-                        <strong style="color: #065f46;">Astuce :</strong>
-                    </div>
-                    <p style="color: #065f46; margin: 8px 0 0 0; font-size: 0.9rem;">Utilisez les flèches ← → pour naviguer entre les onglets focalisés !</p>
+                <div style="margin-top: 20px; padding: 15px; background: #fef8f0; border-radius: 8px; font-size: 0.8rem; color: #92400e;">
+                    💡 <strong>Astuce :</strong> Utilisez les flèches ← → pour naviguer entre les onglets focalisés ! Cliquez sur le badge cookies en bas à droite pour gérer vos préférences.
                 </div>
             </div>
         `;
 
-        this.showNotification(helpHTML, 'info', 15000);
+        this.showNotification(helpHTML, 'info', 8000);
     }
 
     // ========== ANIMATIONS ==========
@@ -1167,9 +1150,10 @@ class YakoLegal {
         this.switchLegalSection(targetSection);
     }
 
-    // ========== NOTIFICATIONS - STYLE SUPPORT ==========
+    // ========== NOTIFICATIONS - STYLE HARMONISÉ ==========
     showNotification(message, type = 'success', duration = 5000) {
-        document.querySelectorAll('.notification').forEach(notif => notif.remove());
+        // Supprimer les notifications existantes
+        document.querySelectorAll('.notification, .yako-notification').forEach(notif => notif.remove());
 
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
@@ -1181,55 +1165,90 @@ class YakoLegal {
             info: 'fa-info-circle'
         };
 
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+
         notification.innerHTML = `
-            <div style="display: flex; align-items: flex-start; gap: 15px; width: 100%;">
-                <i class="fas ${icons[type] || icons.info}" style="margin-top: 3px; flex-shrink: 0; font-size: 1.4rem;"></i>
-                <div style="flex: 1; line-height: 1.5;">
-                    ${message}
-                </div>
-                <button onclick="this.closest('.notification').remove()" 
-                        style="background: none; border: none; color: inherit; cursor: pointer; font-size: 1.4rem; padding: 0; margin-left: 10px; opacity: 0.8; transition: opacity 0.3s ease; flex-shrink: 0;"
-                        onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"
-                        title="Fermer">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <i class="fas ${icons[type] || icons.info}" style="font-size: 1.1rem; margin-top: 2px; flex-shrink: 0;"></i>
+                <div style="flex: 1; line-height: 1.4;">${message}</div>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; color: inherit; cursor: pointer; font-size: 1.2rem; margin-left: 10px; opacity: 0.7; flex-shrink: 0; padding: 0; line-height: 1;"
+                        aria-label="Fermer la notification">
                     ×
                 </button>
             </div>
         `;
 
+        const isDarkModeActive = document.body.classList.contains('dark-mode');
+
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: ${isDarkModeActive ? '#1e293b' : 'white'};
+            color: ${isDarkModeActive ? '#e2e8f0' : colors[type]};
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 4px solid ${colors[type]};
+            border: 1px solid ${isDarkModeActive ? colors[type] : 'rgba(0, 0, 0, 0.1)'};
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideInFromRight 0.3s ease;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            max-width: 380px;
+            min-width: 300px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        `;
+
+        // Ajouter l'animation CSS si elle n'existe pas
+        if (!document.querySelector('#notification-animations')) {
+            const style = document.createElement('style');
+            style.id = 'notification-animations';
+            style.textContent = `
+                @keyframes slideInFromRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutToRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         document.body.appendChild(notification);
 
-        const autoClose = setTimeout(() => {
-            if (notification && notification.parentNode) {
-                notification.style.animation = 'slideOutToRight 0.4s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) notification.remove();
-                }, 400);
-            }
-        }, duration);
-
-        notification.addEventListener('click', (e) => {
-            if (e.target === notification || e.target.closest('.notification') === notification) {
-                clearTimeout(autoClose);
-                notification.style.animation = 'slideOutToRight 0.4s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) notification.remove();
-                }, 400);
-            }
-        });
-
-        notification.addEventListener('mouseenter', () => {
-            clearTimeout(autoClose);
-        });
-
-        notification.addEventListener('mouseleave', () => {
+        // Auto-suppression
+        if (duration > 0) {
             setTimeout(() => {
                 if (notification && notification.parentNode) {
-                    notification.style.animation = 'slideOutToRight 0.4s ease';
+                    notification.style.animation = 'slideOutToRight 0.3s ease';
                     setTimeout(() => {
-                        if (notification.parentNode) notification.remove();
-                    }, 400);
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
                 }
-            }, 2000);
+            }, duration);
+        }
+
+        // Fermer au clic
+        notification.addEventListener('click', (e) => {
+            if (e.target === notification || e.target.closest('button')) {
+                notification.style.animation = 'slideOutToRight 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
         });
     }
 
@@ -1282,6 +1301,28 @@ class YakoLegal {
             .cookie-status-badge span {
                 font-weight: 600 !important;
                 font-size: 0.9rem !important;
+            }
+
+            /* Amélioration des tooltips kbd harmonisé */
+            kbd {
+                background: #f1f5f9;
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+                color: #334155;
+                display: inline-block;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+                font-size: 0.85em;
+                font-weight: 700;
+                line-height: 1;
+                padding: 2px 4px;
+                white-space: nowrap;
+            }
+            
+            body.dark-mode kbd {
+                background: #4b5563;
+                border-color: #6b7280;
+                color: #e5e7eb;
             }
         `;
         document.head.appendChild(styles);
