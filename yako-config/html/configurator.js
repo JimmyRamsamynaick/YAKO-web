@@ -1,1449 +1,1143 @@
-// js/configurator.js - Frontend JavaScript avec vraie API Discord
-class DiscordConfigurator {
+class BotConfigurator {
     constructor() {
-        this.isConnected = false;
+        this.isAuthenticated = false;
         this.currentUser = null;
-        this.userServers = [];
-        this.selectedServer = null;
-        this.serverConfigs = new Map();
-        this.currentTab = 'modules';
-        // MODIFIEZ CETTE LIGNE pour votre URL backend
+        this.guilds = [];
+        this.selectedGuild = null;
+        this.currentTab = 'features';
+        this.configurations = new Map();
         this.apiBaseUrl = 'http://localhost:3000';
-        this.loadingStates = new Set();
-        this.hasUnsavedChanges = false;
-        this.pendingModalAction = null;
-        this.modulesData = [];
+        this.pendingChanges = new Set();
+
+        this.init();
     }
 
-    // ========== INITIALISATION ==========
     async init() {
-        console.log('🔧 Discord Configurator Real - Initialisation...');
+        console.log('🚀 Initialisation du configurateur YAKO Bot');
 
-        this.bindEvents();
+        this.setupEventListeners();
         await this.checkAuthStatus();
-        this.initModulesData();
         this.handleUrlParams();
-        this.setupErrorHandling();
 
-        console.log('✅ Discord Configurator Real initialisé');
+        console.log('✅ Configurateur initialisé');
     }
 
-    // ========== GESTION DES ERREURS ==========
-    setupErrorHandling() {
-        window.addEventListener('error', (e) => {
-            console.error('❌ Erreur JavaScript:', e.error);
-            this.showNotification('Une erreur inattendue s\'est produite', 'error');
-        });
-
-        window.addEventListener('unhandledrejection', (e) => {
-            console.error('❌ Promise rejetée:', e.reason);
-            this.showNotification('Erreur de connexion réseau', 'error');
-        });
-    }
-
-    // ========== GESTION DES PARAMÈTRES URL ==========
-    handleUrlParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-
-        if (urlParams.get('success') === 'true') {
-            this.showNotification('✅ Connexion Discord réussie !', 'success');
-            window.history.replaceState({}, document.title, window.location.pathname);
-            setTimeout(() => this.checkAuthStatus(), 1500);
-        }
-
-        if (urlParams.get('error')) {
-            const errorType = urlParams.get('error');
-            let errorMessage = 'Erreur de connexion Discord';
-
-            switch (errorType) {
-                case 'no_code':
-                    errorMessage = 'Code d\'autorisation manquant - Veuillez réessayer';
-                    break;
-                case 'auth_failed':
-                    errorMessage = 'Échec de l\'authentification Discord';
-                    break;
-                case 'invalid_state':
-                    errorMessage = 'État de sécurité invalide - Session expirée';
-                    break;
-                default:
-                    errorMessage = 'Erreur de connexion inconnue';
-            }
-
-            this.showNotification(`❌ ${errorMessage}`, 'error', 6000);
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
-
-    // ========== ÉVÉNEMENTS ==========
-    bindEvents() {
-        this.bindElement('connectDiscordBtn', 'click', () => this.connectToDiscord());
-        this.bindElement('connectButton', 'click', () => this.connectToDiscord());
-        this.bindElement('disconnectBtn', 'click', () => this.disconnect());
-        this.bindElement('yakoHome', 'click', () => this.showWelcomeScreen());
-
-        document.querySelectorAll('.config-tab').forEach(tab => {
-            tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
-        });
-
-        this.bindElement('saveConfig', 'click', () => this.saveConfiguration());
-        this.bindElement('deployConfig', 'click', () => this.deployBot());
-        this.bindElement('modalCancel', 'click', () => this.hideModal());
-        this.bindElement('modalConfirm', 'click', () => this.confirmModalAction());
-
-        const modalOverlay = document.getElementById('modalOverlay');
-        if (modalOverlay) {
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target.id === 'modalOverlay') {
-                    this.hideModal();
-                }
-            });
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.hideModal();
-            }
-        });
-    }
-
-    bindElement(id, event, handler) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener(event, handler);
-        } else {
-            console.warn(`⚠️ Élément #${id} non trouvé`);
-        }
-    }
-
-    // ========== AUTHENTIFICATION DISCORD RÉELLE ==========
-    async connectToDiscord() {
-        if (this.loadingStates.has('connect')) return;
-
-        try {
-            this.setLoading('connect', true);
-            this.showNotification('🔗 Redirection vers Discord...', 'info');
-
-            const response = await this.fetchWithTimeout(`${this.apiBaseUrl}/auth/discord`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                throw new Error(`Erreur serveur ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-
-            if (data.authUrl) {
-                console.log('🔗 Redirection vers Discord OAuth');
-                localStorage.setItem('yakoConnecting', 'true');
-                window.location.href = data.authUrl;
-            } else {
-                throw new Error('URL d\'authentification non reçue du serveur');
-            }
-        } catch (error) {
-            console.error('❌ Erreur de connexion Discord:', error);
-            this.showNotification(`❌ Erreur de connexion: ${error.message}`, 'error');
-        } finally {
-            this.setLoading('connect', false);
-        }
-    }
+    // ========== GESTION DE L'AUTHENTIFICATION ==========
 
     async checkAuthStatus() {
-        if (this.loadingStates.has('auth')) return;
-
         try {
-            this.setLoading('auth', true);
             console.log('🔍 Vérification du statut d\'authentification...');
+            this.showLoading('Vérification de la connexion...');
 
-            const response = await this.fetchWithTimeout(`${this.apiBaseUrl}/api/auth/status`, {
-                method: 'GET',
-                credentials: 'include'
-            });
+            const response = await this.apiCall('/api/auth/status');
+            console.log('📊 Réponse statut auth:', response);
 
-            if (!response.ok) {
-                throw new Error(`Erreur ${response.status}`);
-            }
+            if (response.success && response.user) {
+                this.isAuthenticated = true;
+                this.currentUser = response.user;
+                this.guilds = response.guilds || [];
 
-            const data = await response.json();
+                console.log(`✅ Connecté en tant que ${response.user.username}`);
+                console.log(`🏰 ${this.guilds.length} serveur(s) avec permissions admin`);
 
-            if (data.isConnected && data.user) {
-                console.log('✅ Utilisateur connecté:', data.user.username);
-
-                this.currentUser = data.user;
-                this.userServers = data.guilds || [];
-                this.isConnected = true;
-
-                localStorage.removeItem('yakoConnecting');
-
-                this.updateUI();
-                this.renderServers();
-
-                console.log(`📊 ${this.userServers.length} serveur(s) avec permissions admin trouvé(s)`);
-
-                if (this.userServers.length === 0) {
-                    this.showNotification('ℹ️ Aucun serveur avec permissions admin trouvé', 'warning');
-                }
+                this.updateAuthUI();
+                this.showServerSelection();
+                this.showNotification('Connexion établie', 'success');
             } else {
-                console.log('❌ Utilisateur non connecté');
-                this.isConnected = false;
-                this.updateUI();
+                console.log('❌ Non authentifié');
+                this.isAuthenticated = false;
+                this.showWelcomePage();
             }
         } catch (error) {
-            console.error('❌ Erreur vérification statut auth:', error);
-            this.isConnected = false;
-            this.updateUI();
-
-            if (localStorage.getItem('yakoConnecting')) {
-                localStorage.removeItem('yakoConnecting');
-                this.showNotification('❌ Erreur lors de la vérification de la connexion', 'error');
-            }
+            console.error('❌ Erreur vérification auth:', error);
+            this.isAuthenticated = false;
+            this.showWelcomePage();
+            this.showNotification('Erreur de vérification de connexion', 'error');
         } finally {
-            this.setLoading('auth', false);
+            this.hideLoading();
         }
     }
 
-    async disconnect() {
-        this.showModal(
-            'Déconnexion',
-            'Êtes-vous sûr de vouloir vous déconnecter ? Les modifications non sauvegardées seront perdues.',
-            async () => {
-                try {
-                    this.setLoading('disconnect', true);
+    async login() {
+        try {
+            console.log('🔐 Tentative de connexion Discord...');
+            this.showLoading('Connexion à Discord...');
 
-                    const response = await this.fetchWithTimeout(`${this.apiBaseUrl}/api/auth/logout`, {
-                        method: 'POST',
-                        credentials: 'include'
-                    });
+            const response = await this.apiCall('/auth/discord');
+            console.log('📨 Réponse login:', response);
 
-                    if (response.ok) {
-                        this.showNotification('✅ Déconnexion réussie', 'success');
-
-                        // Recharger la page après un court délai pour voir la notification
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        throw new Error('Erreur lors de la déconnexion');
-                    }
-                } catch (error) {
-                    console.error('❌ Erreur déconnexion:', error);
-                    this.showNotification('❌ Erreur lors de la déconnexion', 'error');
-                    this.setLoading('disconnect', false);
-                }
+            if (response.success && response.authUrl) {
+                console.log('✅ URL d\'authentification reçue, redirection...');
+                window.location.href = response.authUrl;
+            } else {
+                throw new Error(response.error || 'URL d\'authentification non reçue');
             }
-        );
+        } catch (error) {
+            console.error('❌ Erreur login:', error);
+
+            let errorMessage = 'Erreur de connexion Discord';
+            if (error.message.includes('Configuration Discord manquante')) {
+                errorMessage = 'Configuration Discord incomplete. Vérifiez le fichier .env';
+            }
+
+            this.showNotification(errorMessage, 'error');
+            this.hideLoading();
+        }
     }
 
-    resetState() {
-        this.isConnected = false;
-        this.currentUser = null;
-        this.userServers = [];
-        this.selectedServer = null;
-        this.currentTab = 'modules';
-        this.serverConfigs.clear();
-        this.updateUI();
+    async logout() {
+        try {
+            console.log('🚪 Déconnexion...');
+            await this.apiCall('/auth/logout', 'POST');
+
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.guilds = [];
+            this.selectedGuild = null;
+
+            this.updateAuthUI();
+            this.showWelcomePage();
+            this.showNotification('Déconnexion réussie', 'info');
+        } catch (error) {
+            console.error('❌ Erreur logout:', error);
+            this.showNotification('Erreur de déconnexion', 'error');
+        }
     }
 
     // ========== GESTION DES SERVEURS ==========
+
     renderServers() {
-        const serversList = document.getElementById('serversList');
-        if (!serversList) return;
-
-        serversList.innerHTML = '';
-
-        if (this.userServers.length === 0) {
-            const noServersMsg = document.createElement('div');
-            noServersMsg.className = 'no-servers-message';
-            noServersMsg.innerHTML = `
-                <i class="fas fa-info-circle"></i>
-                <span>Aucun serveur admin</span>
-            `;
-            serversList.appendChild(noServersMsg);
+        const serversGrid = document.getElementById('serversGrid');
+        if (!serversGrid) {
+            console.warn('Element serversGrid not found');
             return;
         }
 
-        this.userServers.forEach(server => {
-            const serverElement = this.createServerElement(server);
-            serversList.appendChild(serverElement);
+        serversGrid.innerHTML = '';
+
+        if (this.guilds.length === 0) {
+            serversGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-server"></i>
+                    <h3>Aucun serveur trouvé</h3>
+                    <p>Vous devez avoir les permissions d'administrateur sur un serveur pour le configurer.</p>
+                    <p><small>Si vous êtes admin d'un serveur et qu'il n'apparaît pas, vérifiez vos permissions.</small></p>
+                    <button class="btn btn-primary" onclick="location.reload()">
+                        <i class="fas fa-refresh"></i>
+                        Actualiser
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        console.log(`🏰 Affichage de ${this.guilds.length} serveur(s)`);
+
+        // Trier les serveurs : bot installé en premier, puis par nombre de membres
+        const sortedGuilds = [...this.guilds].sort((a, b) => {
+            // D'abord par statut du bot (installé en premier)
+            if (a.bot_installed !== b.bot_installed) {
+                return b.bot_installed - a.bot_installed;
+            }
+            // Puis par nombre de membres (plus grand en premier)
+            return (b.approximate_member_count || 0) - (a.approximate_member_count || 0);
         });
 
-        console.log('🖥️ Serveurs rendus dans l\'interface');
+        sortedGuilds.forEach(guild => {
+            const serverCard = this.createServerCard(guild);
+            serversGrid.appendChild(serverCard);
+        });
+
+        console.log(`✅ ${this.guilds.filter(g => g.bot_installed).length} serveur(s) avec bot installé`);
     }
 
-    createServerElement(server) {
-        const serverDiv = document.createElement('div');
-        serverDiv.className = `server-icon ${server.yakoInstalled ? 'has-yako' : 'no-yako'}`;
-        serverDiv.title = this.getServerTooltip(server);
-        serverDiv.dataset.serverId = server.id;
+    createServerCard(guild) {
+        const card = document.createElement('div');
+        card.className = 'server-card';
+        card.dataset.guildId = guild.id;
 
-        if (server.icon) {
-            const img = document.createElement('img');
-            img.src = `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png?size=256`;
-            img.alt = server.name;
-            img.onerror = () => {
-                img.style.display = 'none';
-                this.addServerInitial(serverDiv, server.name);
-            };
-            serverDiv.appendChild(img);
-        } else {
-            this.addServerInitial(serverDiv, server.name);
-        }
+        const iconUrl = guild.icon
+            ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`
+            : null;
 
-        if (server.yakoInstalled) {
-            const notification = document.createElement('div');
-            notification.className = 'server-notification';
-            notification.textContent = '✓';
-            notification.title = 'YAKO installé et configuré';
-            serverDiv.appendChild(notification);
-        }
+        // Afficher le nombre de membres avec formatage
+        const memberCount = this.formatMemberCount(guild.approximate_member_count || 0);
 
-        serverDiv.addEventListener('click', () => this.selectServer(server));
+        card.innerHTML = `
+            <div class="server-card-header">
+                <div class="server-icon" ${iconUrl ? `style="background-image: url(${iconUrl})"` : ''}>
+                    ${!iconUrl ? guild.name.charAt(0).toUpperCase() : ''}
+                </div>
+                <div class="server-details">
+                    <h3>${this.escapeHtml(guild.name)}</h3>
+                    <p>${memberCount}</p>
+                </div>
+            </div>
+            <div class="server-status ${guild.bot_installed ? 'installed' : 'not-installed'}">
+                ${guild.bot_installed ? '✅ Bot installé' : '⚠️ Bot non installé'}
+            </div>
+            ${!guild.bot_installed ? `
+                <button class="invite-bot-btn" onclick="configurator.inviteBot('${guild.id}')">
+                    <i class="fas fa-plus"></i>
+                    Inviter le bot
+                </button>
+            ` : ''}
+        `;
 
-        serverDiv.addEventListener('mouseenter', () => {
-            if (!serverDiv.classList.contains('active')) {
-                serverDiv.style.transform = 'scale(1.1)';
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.invite-bot-btn')) {
+                this.selectServer(guild);
             }
         });
 
-        serverDiv.addEventListener('mouseleave', () => {
-            if (!serverDiv.classList.contains('active')) {
-                serverDiv.style.transform = 'scale(1)';
-            }
-        });
-
-        return serverDiv;
+        return card;
     }
 
-    addServerInitial(serverDiv, serverName) {
-        const initial = document.createElement('div');
-        initial.className = 'server-initial';
-        initial.textContent = serverName.charAt(0).toUpperCase();
-        serverDiv.appendChild(initial);
+    // Fonction utilitaire pour formater le nombre de membres
+    formatMemberCount(count) {
+        if (count === 0) return 'Nombre de membres non disponible';
+        if (count < 1000) return `${count} membres`;
+        if (count < 1000000) return `${(count / 1000).toFixed(1)}k membres`;
+        return `${(count / 1000000).toFixed(1)}M membres`;
     }
 
-    getServerTooltip(server) {
-        let tooltip = server.name;
-        if (server.memberCount || server.approximate_member_count) {
-            tooltip += ` (${server.memberCount || server.approximate_member_count} membres)`;
-        }
-        tooltip += server.yakoInstalled ? ' • YAKO installé' : ' • YAKO non installé';
-        return tooltip;
-    }
-
-    async selectServer(server) {
-        if (this.loadingStates.has('selectServer')) return;
-
+    async selectServer(guild) {
         try {
-            console.log(`🏰 Sélection du serveur: ${server.name}`);
-            this.setLoading('selectServer', true);
+            console.log(`🏰 Sélection du serveur: ${guild.name}`);
+            this.showLoading('Chargement de la configuration...');
 
-            this.selectedServer = server;
+            this.selectedGuild = guild;
 
-            document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
-            const serverElement = document.querySelector(`[data-server-id="${server.id}"]`);
-            if (serverElement) {
-                serverElement.classList.add('active');
+            // Charger les détails du serveur si le bot est installé
+            if (guild.bot_installed) {
+                console.log('🔄 Chargement des détails du serveur...');
+                const details = await this.apiCall(`/guild/${guild.id}`);
+
+                // Fusionner les informations
+                this.selectedGuild = {
+                    ...guild,
+                    ...details,
+                    // S'assurer que le nombre de membres est correct
+                    approximate_member_count: details.member_count || guild.approximate_member_count || 0
+                };
+
+                console.log(`✅ Détails chargés: ${this.selectedGuild.channels?.length || 0} canaux, ${this.selectedGuild.roles?.length || 0} rôles`);
+
+                await this.loadGuildConfiguration();
+            } else {
+                console.log('⚠️ Bot non installé, configuration limitée');
             }
 
-            if (server.yakoInstalled) {
-                await this.loadServerDetails();
-            }
+            this.showServerConfig();
+            this.updateServerHeader();
+            this.switchTab('features');
 
-            this.updateServerInfo();
-            this.showConfigArea();
-            this.loadServerConfiguration();
-
-            this.showNotification(`📋 Serveur "${server.name}" sélectionné`, 'info');
         } catch (error) {
             console.error('❌ Erreur sélection serveur:', error);
-            this.showNotification('❌ Erreur lors de la sélection du serveur', 'error');
+            this.showNotification('Erreur lors du chargement du serveur', 'error');
         } finally {
-            this.setLoading('selectServer', false);
+            this.hideLoading();
         }
     }
 
-    async loadServerDetails() {
-        if (!this.selectedServer) return;
-
+    async inviteBot(guildId) {
         try {
-            console.log(`🔍 Chargement des détails pour ${this.selectedServer.name}...`);
+            console.log(`🤖 Invitation du bot sur le serveur ${guildId}`);
+            const response = await this.apiCall(`/guild/${guildId}/invite`);
 
-            const response = await this.fetchWithTimeout(`${this.apiBaseUrl}/api/guild/${this.selectedServer.id}`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-
-                this.selectedServer.details = data.guild;
-                this.selectedServer.channels = data.channels;
-                this.selectedServer.roles = data.roles;
-
-                console.log('✅ Détails serveur chargés:', {
-                    channels: data.channels?.length || 0,
-                    roles: data.roles?.length || 0
-                });
-            } else if (response.status === 403) {
-                console.warn('⚠️ Bot non présent sur le serveur');
-                this.selectedServer.yakoInstalled = false;
-            } else {
-                throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error('❌ Erreur chargement détails serveur:', error);
-            if (!error.message.includes('403')) {
-                this.showNotification('⚠️ Impossible de charger les détails du serveur', 'warning');
-            }
-        }
-    }
-
-    async inviteBotToServer() {
-        if (!this.selectedServer) {
-            this.showNotification('Aucun serveur sélectionné', 'warning');
-            return;
-        }
-
-        if (this.loadingStates.has('invite')) return;
-
-        try {
-            this.setLoading('invite', true);
-
-            const response = await this.fetchWithTimeout(`${this.apiBaseUrl}/api/guild/${this.selectedServer.id}/invite-bot`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-
-                const inviteWindow = window.open(
-                    data.inviteUrl,
+            if (response.inviteUrl) {
+                const popup = window.open(
+                    response.inviteUrl,
                     'discord-invite',
                     'width=500,height=700,scrollbars=yes,resizable=yes'
                 );
 
-                if (inviteWindow) {
-                    this.showNotification('🔗 Invitation ouverte dans une nouvelle fenêtre', 'success');
-
-                    const checkInvite = setInterval(() => {
-                        if (inviteWindow.closed) {
-                            clearInterval(checkInvite);
-                            this.showNotification('ℹ️ Vérification de l\'installation...', 'info');
-
-                            setTimeout(() => {
-                                this.checkBotInstallation();
-                            }, 3000);
+                if (popup) {
+                    const checkClosed = setInterval(() => {
+                        if (popup.closed) {
+                            clearInterval(checkClosed);
+                            this.checkBotInstallation(guildId);
                         }
                     }, 1000);
                 } else {
-                    this.showNotification('🔗 Popup bloquée - Lien copié dans le presse-papier', 'warning');
-                    if (navigator.clipboard) {
-                        navigator.clipboard.writeText(data.inviteUrl);
+                    this.showNotification('Popup bloquée - Vérifiez vos paramètres de navigateur', 'warning');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Erreur invitation bot:', error);
+            this.showNotification('Erreur lors de l\'invitation du bot', 'error');
+        }
+    }
+
+    async checkBotInstallation(guildId) {
+        try {
+            console.log(`🔍 Vérification installation bot sur ${guildId}`);
+            this.showNotification('Vérification de l\'installation...', 'info');
+
+            // Attendre un peu pour que Discord traite l'invitation
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            const response = await this.apiCall(`/guild/${guildId}/status`);
+
+            if (response.bot_installed) {
+                this.showNotification('Bot installé avec succès !', 'success');
+
+                // Mettre à jour les informations du serveur
+                const guild = this.guilds.find(g => g.id === guildId);
+                if (guild) {
+                    guild.bot_installed = true;
+                    // Mettre à jour le nombre de membres si disponible
+                    if (response.member_count) {
+                        guild.approximate_member_count = response.member_count;
                     }
                 }
+
+                // Recharger l'affichage des serveurs
+                this.renderServers();
+
+                console.log(`✅ Bot installé et détecté sur ${guild?.name || guildId}`);
             } else {
-                throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+                console.log(`❌ Bot non détecté sur ${guildId}:`, response.error || 'Raison inconnue');
+                this.showNotification(
+                    response.error === 'Bot non autorisé'
+                        ? 'Bot non autorisé - Vérifiez les permissions'
+                        : 'Bot non détecté - Réessayez dans quelques instants',
+                    'warning'
+                );
             }
         } catch (error) {
-            console.error('❌ Erreur génération lien invitation:', error);
-            this.showNotification('❌ Erreur lors de la génération du lien d\'invitation', 'error');
-        } finally {
-            this.setLoading('invite', false);
+            console.error('❌ Erreur vérification installation:', error);
+            this.showNotification('Erreur lors de la vérification', 'error');
         }
     }
 
-    async checkBotInstallation() {
-        if (!this.selectedServer) return;
+    // ========== GESTION DE LA CONFIGURATION ==========
 
+    async loadGuildConfiguration() {
         try {
-            const response = await this.fetchWithTimeout(`${this.apiBaseUrl}/api/guild/${this.selectedServer.id}/yako-status`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-
-                if (data.yakoInstalled && !this.selectedServer.yakoInstalled) {
-                    this.selectedServer.yakoInstalled = true;
-                    this.updateServerInfo();
-                    this.renderServers();
-                    this.loadServerConfiguration();
-
-                    this.showNotification('🎉 YAKO a été installé avec succès !', 'success');
-                } else if (!data.yakoInstalled) {
-                    this.showNotification('ℹ️ YAKO n\'a pas encore été installé', 'info');
-                }
-            }
+            // Pour l'instant, on utilise une configuration par défaut
+            // Plus tard, vous pourrez implémenter la sauvegarde en base de données
+            this.configurations.set(this.selectedGuild.id, this.getDefaultConfig());
         } catch (error) {
-            console.error('❌ Erreur vérification installation bot:', error);
+            console.error('❌ Erreur chargement config:', error);
+            this.configurations.set(this.selectedGuild.id, this.getDefaultConfig());
         }
     }
 
-    // ========== GESTION DE L'INTERFACE ==========
-    updateUI() {
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const configArea = document.getElementById('configArea');
-        const userInfo = document.getElementById('userInfo');
-        const connectButton = document.getElementById('connectButton');
-
-        if (this.isConnected && this.currentUser) {
-            if (welcomeScreen) welcomeScreen.style.display = 'none';
-            if (userInfo) userInfo.style.display = 'flex';
-            if (connectButton) connectButton.style.display = 'none';
-
-            this.updateUserInfo();
-
-            if (this.selectedServer && configArea) {
-                configArea.style.display = 'flex';
+    getDefaultConfig() {
+        return {
+            features: {
+                moderation: { enabled: false },
+                music: { enabled: false },
+                levels: { enabled: false },
+                welcome: { enabled: false },
+                economy: { enabled: false },
+                polls: { enabled: false }
+            },
+            moderation: {
+                auto_mod: false,
+                filter_words: [],
+                max_mentions: 5,
+                spam_protection: true,
+                log_channel: null
+            },
+            music: {
+                default_volume: 50,
+                max_queue_size: 100,
+                auto_leave: true,
+                voice_channel: null
+            },
+            levels: {
+                xp_per_message: 15,
+                level_up_channel: null,
+                role_rewards: [],
+                blacklisted_channels: []
+            },
+            logs: {
+                moderation: { enabled: false, channel: null },
+                messages: { enabled: false, channel: null },
+                voice: { enabled: false, channel: null },
+                members: { enabled: false, channel: null }
             }
-        } else {
-            if (welcomeScreen) welcomeScreen.style.display = 'flex';
-            if (configArea) configArea.style.display = 'none';
-            if (userInfo) userInfo.style.display = 'none';
-            if (connectButton) connectButton.style.display = 'flex';
-
-            this.resetServerInfo();
-        }
+        };
     }
 
-    updateUserInfo() {
-        const avatarUrl = this.currentUser.avatar
-            ? `https://cdn.discordapp.com/avatars/${this.currentUser.id}/${this.currentUser.avatar}.png?size=128`
-            : `https://cdn.discordapp.com/embed/avatars/${(this.currentUser.discriminator || 0) % 5}.png`;
-
-        const userAvatar = document.getElementById('userAvatar');
-        const username = document.getElementById('username');
-
-        if (userAvatar) {
-            userAvatar.style.backgroundImage = `url(${avatarUrl})`;
-        }
-
-        if (username) {
-            const displayName = this.currentUser.global_name ||
-                `${this.currentUser.username}${this.currentUser.discriminator ? '#' + this.currentUser.discriminator : ''}`;
-            username.textContent = displayName;
-        }
+    getCurrentConfig() {
+        return this.configurations.get(this.selectedGuild?.id) || this.getDefaultConfig();
     }
 
-    updateServerInfo() {
-        const currentServerName = document.getElementById('currentServerName');
-        const serverStatus = document.getElementById('serverStatus');
+    updateConfig(path, value) {
+        const config = this.getCurrentConfig();
+        const keys = path.split('.');
+        let current = config;
 
-        if (this.selectedServer) {
-            if (currentServerName) {
-                currentServerName.textContent = this.selectedServer.name;
-            }
-
-            if (serverStatus) {
-                let statusText = '';
-                const memberCount = this.selectedServer.memberCount || this.selectedServer.approximate_member_count;
-                if (memberCount) {
-                    statusText += `${memberCount} membres`;
-                }
-                statusText += ` • ${this.selectedServer.yakoInstalled ? '✅ YAKO installé' : '⚠️ YAKO non installé'}`;
-                serverStatus.textContent = statusText;
-            }
-        }
-    }
-
-    resetServerInfo() {
-        const currentServerName = document.getElementById('currentServerName');
-        const serverStatus = document.getElementById('serverStatus');
-
-        if (currentServerName) {
-            currentServerName.textContent = 'YAKO Configurateur';
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) current[keys[i]] = {};
+            current = current[keys[i]];
         }
 
-        if (serverStatus) {
-            serverStatus.textContent = 'Connectez-vous pour commencer';
-        }
+        current[keys[keys.length - 1]] = value;
+        this.configurations.set(this.selectedGuild.id, config);
+        this.markAsChanged(path);
     }
 
-    showWelcomeScreen() {
-        this.selectedServer = null;
-        document.querySelectorAll('.server-icon').forEach(el => el.classList.remove('active'));
-
-        const configArea = document.getElementById('configArea');
-        const welcomeScreen = document.getElementById('welcomeScreen');
-
-        if (configArea) configArea.style.display = 'none';
-        if (welcomeScreen) welcomeScreen.style.display = 'flex';
-
-        this.resetServerInfo();
-
-        if (this.isConnected) {
-            const serverStatus = document.getElementById('serverStatus');
-            if (serverStatus) {
-                serverStatus.textContent = 'Sélectionnez un serveur pour commencer';
-            }
-        }
+    markAsChanged(path) {
+        this.pendingChanges.add(path);
+        this.updateSaveButton();
     }
 
-    showConfigArea() {
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const configArea = document.getElementById('configArea');
-
-        if (welcomeScreen) welcomeScreen.style.display = 'none';
-        if (configArea) configArea.style.display = 'flex';
-    }
-
-    // ========== GESTION DES ONGLETS ==========
-    switchTab(tabName) {
-        if (this.currentTab === tabName) return;
-
-        this.currentTab = tabName;
-
-        document.querySelectorAll('.config-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === tabName);
-        });
-
-        document.querySelectorAll('.tab-pane').forEach(pane => {
-            const isActive = pane.id === `${tabName}-tab`;
-            if (isActive) {
-                pane.classList.add('active');
-                pane.style.opacity = '0';
-                setTimeout(() => {
-                    pane.style.opacity = '1';
-                }, 50);
+    updateSaveButton() {
+        const saveBtn = document.getElementById('saveBtn');
+        if (saveBtn) {
+            if (this.pendingChanges.size > 0) {
+                saveBtn.classList.add('btn-warning');
+                saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Modifications non sauvegardées';
             } else {
-                pane.classList.remove('active');
+                saveBtn.classList.remove('btn-warning');
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Sauvegarder';
             }
-        });
-
-        this.loadTabContent(tabName);
-        console.log(`📋 Onglet "${tabName}" activé`);
-    }
-
-    loadTabContent(tabName) {
-        try {
-            switch (tabName) {
-                case 'modules':
-                    this.renderModules();
-                    break;
-                case 'permissions':
-                    this.renderPermissions();
-                    break;
-                case 'channels':
-                    this.renderChannels();
-                    break;
-                case 'logs':
-                    this.renderLogs();
-                    break;
-                default:
-                    console.warn(`⚠️ Onglet inconnu: ${tabName}`);
-            }
-        } catch (error) {
-            console.error(`❌ Erreur chargement onglet ${tabName}:`, error);
-            this.showNotification(`Erreur lors du chargement de l'onglet ${tabName}`, 'error');
         }
     }
 
-    // ========== MODULES ET AUTRES RENDUS ==========
-    initModulesData() {
-        this.modulesData = [
+    // ========== RENDU DES ONGLETS ==========
+
+    renderFeaturesTab() {
+        const featuresList = document.getElementById('featuresList');
+        if (!featuresList) return;
+
+        const config = this.getCurrentConfig();
+        const features = [
             {
                 id: 'moderation',
                 name: 'Modération',
-                icon: 'fas fa-shield-alt',
-                description: 'Outils de modération automatique et manuelle pour maintenir l\'ordre.',
-                features: [
-                    'Auto-modération intelligente',
-                    'Système de sanctions graduelles',
-                    'Filtrage de contenu',
-                    'Logs de modération'
-                ],
-                enabled: false
+                description: 'Outils de modération automatique et manuelle',
+                icon: 'fas fa-shield-alt'
             },
             {
                 id: 'music',
                 name: 'Musique',
-                icon: 'fas fa-music',
-                description: 'Lecteur de musique avec support YouTube, Spotify et autres plateformes.',
-                features: [
-                    'Lecture depuis YouTube/Spotify',
-                    'Files d\'attente et playlists',
-                    'Contrôles vocaux',
-                    'Qualité audio HD'
-                ],
-                enabled: false
+                description: 'Lecteur musical avec support multi-plateformes',
+                icon: 'fas fa-music'
             },
             {
                 id: 'levels',
                 name: 'Système de niveaux',
-                icon: 'fas fa-trophy',
-                description: 'Gamification avec XP, niveaux et récompenses pour encourager l\'activité.',
-                features: [
-                    'Gain d\'XP par activité',
-                    'Classements et tableaux',
-                    'Rôles de récompense',
-                    'Badges personnalisés'
-                ],
-                enabled: true
+                description: 'XP, niveaux et récompenses pour les membres',
+                icon: 'fas fa-trophy'
             },
             {
                 id: 'welcome',
                 name: 'Messages de bienvenue',
-                icon: 'fas fa-hand-wave',
-                description: 'Accueillez automatiquement les nouveaux membres avec des messages personnalisés.',
-                features: [
-                    'Messages personnalisables',
-                    'Attribution de rôles automatique',
-                    'Images de bienvenue',
-                    'Règles du serveur'
-                ],
-                enabled: false
+                description: 'Accueil automatique des nouveaux membres',
+                icon: 'fas fa-hand-wave'
             },
             {
                 id: 'economy',
                 name: 'Économie',
-                icon: 'fas fa-coins',
-                description: 'Système économique virtuel avec monnaie, boutique et jeux.',
-                features: [
-                    'Monnaie virtuelle',
-                    'Boutique d\'objets',
-                    'Jeux d\'argent',
-                    'Transactions entre utilisateurs'
-                ],
-                enabled: false
+                description: 'Système de monnaie virtuelle et boutique',
+                icon: 'fas fa-coins'
             },
             {
                 id: 'polls',
                 name: 'Sondages',
-                icon: 'fas fa-poll',
-                description: 'Créez des sondages interactifs avec options multiples.',
-                features: [
-                    'Sondages à choix multiples',
-                    'Votes anonymes',
-                    'Résultats en temps réel',
-                    'Programmation de sondages'
-                ],
-                enabled: true
+                description: 'Création de sondages interactifs',
+                icon: 'fas fa-poll'
             }
         ];
-    }
 
-    renderModules() {
-        const modulesGrid = document.getElementById('modulesGrid');
-        if (!modulesGrid) return;
-
-        if (!this.selectedServer?.yakoInstalled) {
-            modulesGrid.innerHTML = this.getNotInstalledMessage('Invitez YAKO sur ce serveur pour activer les modules');
-            return;
-        }
-
-        const config = this.getServerConfig();
-
-        let modulesHTML = '';
-        this.modulesData.forEach(module => {
-            const isEnabled = config.modules?.[module.id]?.enabled ?? module.enabled;
-
-            modulesHTML += `
-                <div class="module-card">
-                    <div class="module-header">
-                        <div class="module-title">
-                            <i class="${module.icon}"></i>
-                            ${module.name}
-                        </div>
-                        <div class="module-toggle ${isEnabled ? 'active' : ''}" data-module="${module.id}">
-                        </div>
+        featuresList.innerHTML = features.map(feature => `
+            <div class="feature-item">
+                <div class="feature-info">
+                    <div class="feature-icon">
+                        <i class="${feature.icon}"></i>
                     </div>
-                    <div class="module-description">${module.description}</div>
-                    <ul class="module-features">
-                        ${module.features.map(feature => `<li>${feature}</li>`).join('')}
-                    </ul>
+                    <div class="feature-details">
+                        <h4>${feature.name}</h4>
+                        <p>${feature.description}</p>
+                    </div>
                 </div>
-            `;
-        });
-
-        modulesGrid.innerHTML = modulesHTML;
-
-        modulesGrid.querySelectorAll('.module-toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const moduleId = toggle.dataset.module;
-                this.toggleModule(moduleId);
-            });
-        });
+                <div class="toggle-switch ${config.features[feature.id]?.enabled ? 'active' : ''}" 
+                     onclick="configurator.toggleFeature('${feature.id}')">
+                </div>
+            </div>
+        `).join('');
     }
 
-    toggleModule(moduleId) {
-        const config = this.getServerConfig();
-        if (!config.modules) config.modules = {};
-        if (!config.modules[moduleId]) config.modules[moduleId] = {};
+    renderModerationTab() {
+        const moderationConfig = document.getElementById('moderationConfig');
+        if (!moderationConfig) return;
 
-        config.modules[moduleId].enabled = !config.modules[moduleId].enabled;
-        this.setServerConfig(config);
+        const config = this.getCurrentConfig();
+        const channels = this.selectedGuild?.channels?.filter(c => c.type === 0) || [];
 
-        const toggle = document.querySelector(`[data-module="${moduleId}"]`);
-        if (toggle) {
-            toggle.classList.toggle('active', config.modules[moduleId].enabled);
-        }
-
-        const moduleName = this.modulesData.find(m => m.id === moduleId)?.name;
-        const status = config.modules[moduleId].enabled ? 'activé' : 'désactivé';
-        this.showNotification(`Module ${moduleName} ${status}`, 'info');
-
-        this.markAsChanged();
-    }
-
-    renderPermissions() {
-        const permissionsList = document.getElementById('permissionsList');
-        if (!permissionsList) return;
-
-        if (!this.selectedServer?.yakoInstalled) {
-            permissionsList.innerHTML = this.getNotInstalledMessage('Invitez YAKO sur ce serveur pour configurer les permissions');
-            return;
-        }
-
-        if (!this.selectedServer.roles) {
-            permissionsList.innerHTML = this.getLoadingMessage('Chargement des rôles...');
-            return;
-        }
-
-        const roles = this.selectedServer.roles
-            .filter(role => role.name !== '@everyone')
-            .sort((a, b) => b.position - a.position);
-
-        if (roles.length === 0) {
-            permissionsList.innerHTML = this.getEmptyMessage('Aucun rôle disponible pour la configuration');
-            return;
-        }
-
-        let permissionsHTML = `
-            <div class="permission-group">
-                <h3><i class="fas fa-user-shield"></i> Configuration des rôles</h3>
-        `;
-
-        roles.forEach(role => {
-            const config = this.getRoleConfig(role.id);
-            const roleColor = role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#99aab5';
-
-            permissionsHTML += `
-                <div class="permission-item">
-                    <div class="permission-info">
-                        <div class="permission-name">
-                            <div class="role-color" style="background-color: ${roleColor};"></div>
-                            ${this.escapeHtml(role.name)}
-                        </div>
-                        <div class="permission-desc">${role.managed ? 'Rôle géré automatiquement' : 'Rôle personnalisé'}</div>
+        moderationConfig.innerHTML = `
+            <div class="config-section">
+                <h4><i class="fas fa-robot"></i> Auto-modération</h4>
+                <div class="config-row">
+                    <span class="config-label">Activer l'auto-modération</span>
+                    <div class="toggle-switch ${config.moderation.auto_mod ? 'active' : ''}" 
+                         onclick="configurator.updateConfig('moderation.auto_mod', ${!config.moderation.auto_mod})">
                     </div>
-                    <select class="permission-level" data-role="${role.id}">
-                        <option value="none" ${config.level === 'none' ? 'selected' : ''}>Aucune permission</option>
-                        <option value="basic" ${config.level === 'basic' ? 'selected' : ''}>Permissions de base</option>
-                        <option value="moderator" ${config.level === 'moderator' ? 'selected' : ''}>Modérateur</option>
-                        <option value="admin" ${config.level === 'admin' ? 'selected' : ''}>Administrateur</option>
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Protection anti-spam</span>
+                    <div class="toggle-switch ${config.moderation.spam_protection ? 'active' : ''}" 
+                         onclick="configurator.updateConfig('moderation.spam_protection', ${!config.moderation.spam_protection})">
+                    </div>
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Mentions maximales par message</span>
+                    <input type="number" class="config-input" value="${config.moderation.max_mentions}"
+                           onchange="configurator.updateConfig('moderation.max_mentions', parseInt(this.value))">
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Salon des logs de modération</span>
+                    <select class="config-select" onchange="configurator.updateConfig('moderation.log_channel', this.value)">
+                        <option value="">Aucun salon</option>
+                        ${channels.map(channel => `
+                            <option value="${channel.id}" ${config.moderation.log_channel === channel.id ? 'selected' : ''}>
+                                #${channel.name}
+                            </option>
+                        `).join('')}
                     </select>
                 </div>
-            `;
-        });
-
-        permissionsHTML += '</div>';
-        permissionsList.innerHTML = permissionsHTML;
-
-        permissionsList.querySelectorAll('.permission-level').forEach(select => {
-            select.addEventListener('change', (e) => {
-                const roleId = select.dataset.role;
-                const level = e.target.value;
-                this.updateRolePermission(roleId, level);
-            });
-        });
-    }
-
-    getRoleConfig(roleId) {
-        const config = this.getServerConfig();
-        return config.permissions?.[roleId] || { level: 'none' };
-    }
-
-    updateRolePermission(roleId, level) {
-        const config = this.getServerConfig();
-        if (!config.permissions) config.permissions = {};
-
-        config.permissions[roleId] = { level };
-        this.setServerConfig(config);
-
-        const role = this.selectedServer.roles.find(r => r.id === roleId);
-        const roleName = role?.name || 'rôle inconnu';
-
-        this.showNotification(`🔐 Permissions "${level}" définies pour le rôle @${roleName}`, 'info');
-        this.markAsChanged();
-    }
-
-    renderChannels() {
-        const channelsList = document.getElementById('channelsList');
-        if (!channelsList) return;
-
-        if (!this.selectedServer?.yakoInstalled) {
-            channelsList.innerHTML = this.getNotInstalledMessage('Invitez YAKO sur ce serveur pour configurer les salons');
-            return;
-        }
-
-        if (!this.selectedServer.channels) {
-            channelsList.innerHTML = this.getLoadingMessage('Chargement des salons...');
-            return;
-        }
-
-        const channels = this.selectedServer.channels;
-        const channelTypes = {
-            0: { name: 'Salon textuel', icon: 'fas fa-hashtag' },
-            2: { name: 'Salon vocal', icon: 'fas fa-volume-up' },
-            4: { name: 'Catégorie', icon: 'fas fa-folder' },
-            5: { name: 'Salon d\'annonces', icon: 'fas fa-bullhorn' },
-            13: { name: 'Salon de forum', icon: 'fas fa-comments' },
-            15: { name: 'Salon de forum média', icon: 'fas fa-images' }
-        };
-
-        const sortedChannels = channels
-            .filter(channel => channel.type !== 4)
-            .sort((a, b) => a.position - b.position);
-
-        if (sortedChannels.length === 0) {
-            channelsList.innerHTML = this.getEmptyMessage('Aucun salon disponible pour la configuration');
-            return;
-        }
-
-        let channelsHTML = '';
-        sortedChannels.forEach(channel => {
-            const channelType = channelTypes[channel.type] || { name: 'Inconnu', icon: 'fas fa-question' };
-            const config = this.getChannelConfig(channel.id);
-
-            channelsHTML += `
-                <div class="channel-item">
-                    <div class="channel-info">
-                        <i class="${channelType.icon} channel-icon"></i>
-                        <div>
-                            <div class="channel-name">${this.escapeHtml(channel.name)}</div>
-                            <div class="channel-type">${channelType.name}</div>
-                        </div>
-                    </div>
-                    <div class="module-toggle ${config.enabled ? 'active' : ''}" 
-                         data-channel="${channel.id}"></div>
+            </div>
+            
+            <div class="config-section">
+                <h4><i class="fas fa-filter"></i> Filtrage de contenu</h4>
+                <div class="config-row">
+                    <span class="config-label">Mots filtrés (un par ligne)</span>
+                    <textarea class="config-input" rows="4" placeholder="Entrez les mots à filtrer..."
+                              onchange="configurator.updateConfig('moderation.filter_words', this.value.split('\\n').filter(w => w.trim()))">${config.moderation.filter_words.join('\n')}</textarea>
                 </div>
-            `;
-        });
-
-        channelsList.innerHTML = channelsHTML;
-
-        channelsList.querySelectorAll('.module-toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const channelId = toggle.dataset.channel;
-                this.toggleChannelConfig(channelId);
-            });
-        });
+            </div>
+        `;
     }
 
-    getChannelConfig(channelId) {
-        const config = this.getServerConfig();
-        return config.channels?.[channelId] || { enabled: false };
+    renderMusicTab() {
+        const musicConfig = document.getElementById('musicConfig');
+        if (!musicConfig) return;
+
+        const config = this.getCurrentConfig();
+        const voiceChannels = this.selectedGuild?.channels?.filter(c => c.type === 2) || [];
+
+        musicConfig.innerHTML = `
+            <div class="config-section">
+                <h4><i class="fas fa-volume-up"></i> Paramètres audio</h4>
+                <div class="config-row">
+                    <span class="config-label">Volume par défaut (${config.music.default_volume}%)</span>
+                    <input type="range" class="range-slider" min="1" max="100" value="${config.music.default_volume}"
+                           onchange="configurator.updateConfig('music.default_volume', parseInt(this.value))">
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Taille maximale de la file d'attente</span>
+                    <input type="number" class="config-input" value="${config.music.max_queue_size}" min="1" max="500"
+                           onchange="configurator.updateConfig('music.max_queue_size', parseInt(this.value))">
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Quitter automatiquement si inactif</span>
+                    <div class="toggle-switch ${config.music.auto_leave ? 'active' : ''}" 
+                         onclick="configurator.updateConfig('music.auto_leave', ${!config.music.auto_leave})">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <h4><i class="fas fa-headphones"></i> Salon vocal par défaut</h4>
+                <div class="config-row">
+                    <span class="config-label">Salon vocal</span>
+                    <select class="config-select" onchange="configurator.updateConfig('music.voice_channel', this.value)">
+                        <option value="">Aucun salon par défaut</option>
+                        ${voiceChannels.map(channel => `
+                            <option value="${channel.id}" ${config.music.voice_channel === channel.id ? 'selected' : ''}>
+                                🔊 ${channel.name}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+            </div>
+        `;
     }
 
-    toggleChannelConfig(channelId) {
-        const config = this.getServerConfig();
-        if (!config.channels) config.channels = {};
-        if (!config.channels[channelId]) config.channels[channelId] = {};
+    renderLevelsTab() {
+        const levelsConfig = document.getElementById('levelsConfig');
+        if (!levelsConfig) return;
 
-        config.channels[channelId].enabled = !config.channels[channelId].enabled;
-        this.setServerConfig(config);
+        const config = this.getCurrentConfig();
+        const textChannels = this.selectedGuild?.channels?.filter(c => c.type === 0) || [];
+        const roles = this.selectedGuild?.roles?.filter(r => r.name !== '@everyone') || [];
 
-        const toggle = document.querySelector(`[data-channel="${channelId}"]`);
-        if (toggle) {
-            toggle.classList.toggle('active', config.channels[channelId].enabled);
-        }
-
-        const channelName = this.selectedServer.channels.find(c => c.id === channelId)?.name || 'salon inconnu';
-
-        this.showNotification(
-            `${config.channels[channelId].enabled ? '✅' : '❌'} Configuration ${config.channels[channelId].enabled ? 'activée' : 'désactivée'} pour #${channelName}`,
-            'info'
-        );
-
-        this.markAsChanged();
+        levelsConfig.innerHTML = `
+            <div class="config-section">
+                <h4><i class="fas fa-star"></i> Paramètres XP</h4>
+                <div class="config-row">
+                    <span class="config-label">XP par message</span>
+                    <input type="number" class="config-input" value="${config.levels.xp_per_message}" min="1" max="100"
+                           onchange="configurator.updateConfig('levels.xp_per_message', parseInt(this.value))">
+                </div>
+                <div class="config-row">
+                    <span class="config-label">Salon d'annonce des niveaux</span>
+                    <select class="config-select" onchange="configurator.updateConfig('levels.level_up_channel', this.value)">
+                        <option value="">Aucun salon</option>
+                        ${textChannels.map(channel => `
+                            <option value="${channel.id}" ${config.levels.level_up_channel === channel.id ? 'selected' : ''}>
+                                #${channel.name}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <h4><i class="fas fa-gift"></i> Récompenses de rôles</h4>
+                <div id="roleRewards">
+                    ${this.renderRoleRewards(config.levels.role_rewards, roles)}
+                </div>
+                <button class="btn btn-outline" onclick="configurator.addRoleReward()">
+                    <i class="fas fa-plus"></i> Ajouter une récompense
+                </button>
+            </div>
+            
+            <div class="config-section">
+                <h4><i class="fas fa-ban"></i> Salons exclus</h4>
+                <div class="config-row">
+                    <span class="config-label">Salons où l'XP n'est pas gagné</span>
+                    <select class="config-select" multiple size="5" onchange="configurator.updateBlacklistedChannels(this)">
+                        ${textChannels.map(channel => `
+                            <option value="${channel.id}" ${config.levels.blacklisted_channels.includes(channel.id) ? 'selected' : ''}>
+                                #${channel.name}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+            </div>
+        `;
     }
 
-    renderLogs() {
+    renderLogsTab() {
         const logsConfig = document.getElementById('logsConfig');
         if (!logsConfig) return;
 
-        if (!this.selectedServer?.yakoInstalled) {
-            logsConfig.innerHTML = this.getNotInstalledMessage('Invitez YAKO sur ce serveur pour configurer les logs');
-            return;
-        }
+        const config = this.getCurrentConfig();
+        const textChannels = this.selectedGuild?.channels?.filter(c => c.type === 0) || [];
 
         const logTypes = [
-            { id: 'moderation', name: 'Modération', icon: 'fas fa-shield-alt', description: 'Sanctions, avertissements, exclusions' },
-            { id: 'messages', name: 'Messages', icon: 'fas fa-comment', description: 'Suppressions, modifications de messages' },
-            { id: 'members', name: 'Membres', icon: 'fas fa-users', description: 'Arrivées, départs, changements de rôles' },
-            { id: 'channels', name: 'Salons', icon: 'fas fa-hashtag', description: 'Créations, suppressions, modifications' },
-            { id: 'server', name: 'Serveur', icon: 'fas fa-server', description: 'Modifications des paramètres du serveur' }
+            { id: 'moderation', name: 'Modération', description: 'Sanctions, avertissements, exclusions', icon: 'fas fa-shield-alt' },
+            { id: 'messages', name: 'Messages', description: 'Suppressions, modifications de messages', icon: 'fas fa-comment' },
+            { id: 'voice', name: 'Vocal', description: 'Connexions, déconnexions vocales', icon: 'fas fa-microphone' },
+            { id: 'members', name: 'Membres', description: 'Arrivées, départs, changements', icon: 'fas fa-users' }
         ];
 
-        let logsHTML = `
-            <div class="permission-group">
-                <h3><i class="fas fa-clipboard-list"></i> Configuration des logs</h3>
-        `;
-
-        logTypes.forEach(logType => {
-            const config = this.getLogConfig(logType.id);
-
-            logsHTML += `
-                <div class="permission-item">
-                    <div class="permission-info">
-                        <div class="permission-name">
-                            <i class="${logType.icon}"></i>
-                            ${logType.name}
-                        </div>
-                        <div class="permission-desc">${logType.description}</div>
-                    </div>
-                    <div class="log-controls">
-                        <div class="module-toggle ${config.enabled ? 'active' : ''}" 
-                             data-log="${logType.id}"></div>
-                        <select class="log-channel" data-log="${logType.id}" ${!config.enabled ? 'disabled' : ''}>
-                            <option value="">Choisir un salon</option>
-                            ${this.renderChannelOptions(config.channelId)}
-                        </select>
+        logsConfig.innerHTML = logTypes.map(logType => `
+            <div class="config-section">
+                <h4><i class="${logType.icon}"></i> ${logType.name}</h4>
+                <p class="config-label">${logType.description}</p>
+                <div class="config-row">
+                    <span class="config-label">Activer les logs ${logType.name.toLowerCase()}</span>
+                    <div class="toggle-switch ${config.logs[logType.id]?.enabled ? 'active' : ''}" 
+                         onclick="configurator.updateConfig('logs.${logType.id}.enabled', ${!config.logs[logType.id]?.enabled})">
                     </div>
                 </div>
-            `;
-        });
-
-        logsHTML += '</div>';
-        logsConfig.innerHTML = logsHTML;
-
-        logsConfig.querySelectorAll('.module-toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const logType = toggle.dataset.log;
-                this.toggleLogConfig(logType);
-            });
-        });
-
-        logsConfig.querySelectorAll('.log-channel').forEach(select => {
-            select.addEventListener('change', (e) => {
-                const logType = select.dataset.log;
-                const channelId = e.target.value;
-                this.updateLogChannel(logType, channelId);
-            });
-        });
+                <div class="config-row">
+                    <span class="config-label">Salon de destination</span>
+                    <select class="config-select" ${!config.logs[logType.id]?.enabled ? 'disabled' : ''}
+                            onchange="configurator.updateConfig('logs.${logType.id}.channel', this.value)">
+                        <option value="">Choisir un salon</option>
+                        ${textChannels.map(channel => `
+                            <option value="${channel.id}" ${config.logs[logType.id]?.channel === channel.id ? 'selected' : ''}>
+                                #${channel.name}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+            </div>
+        `).join('');
     }
 
-    renderChannelOptions(selectedChannelId) {
-        if (!this.selectedServer?.channels) return '';
-
-        return this.selectedServer.channels
-            .filter(channel => channel.type === 0)
-            .map(channel => `
-                <option value="${channel.id}" ${channel.id === selectedChannelId ? 'selected' : ''}>
-                    #${channel.name}
-                </option>
-            `).join('');
+    renderRoleRewards(rewards, roles) {
+        return rewards.map((reward, index) => `
+            <div class="config-row">
+                <span class="config-label">Niveau ${reward.level}</span>
+                <select class="config-select" onchange="configurator.updateRoleReward(${index}, 'role', this.value)">
+                    <option value="">Choisir un rôle</option>
+                    ${roles.map(role => `
+                        <option value="${role.id}" ${reward.role === role.id ? 'selected' : ''}>
+                            @${role.name}
+                        </option>
+                    `).join('')}
+                </select>
+                <input type="number" class="config-input" placeholder="Niveau" value="${reward.level}"
+                       onchange="configurator.updateRoleReward(${index}, 'level', parseInt(this.value))">
+                <button class="btn btn-danger" onclick="configurator.removeRoleReward(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `).join('');
     }
 
-    getLogConfig(logType) {
-        const config = this.getServerConfig();
-        return config.logs?.[logType] || { enabled: false, channelId: null };
+    // ========== ACTIONS DE CONFIGURATION ==========
+
+    toggleFeature(featureId) {
+        const config = this.getCurrentConfig();
+        const currentValue = config.features[featureId]?.enabled || false;
+        this.updateConfig(`features.${featureId}.enabled`, !currentValue);
+        this.renderFeaturesTab();
     }
 
-    toggleLogConfig(logType) {
-        const config = this.getServerConfig();
-        if (!config.logs) config.logs = {};
-        if (!config.logs[logType]) config.logs[logType] = { enabled: false, channelId: null };
+    addRoleReward() {
+        const config = this.getCurrentConfig();
+        if (!config.levels.role_rewards) config.levels.role_rewards = [];
 
-        config.logs[logType].enabled = !config.logs[logType].enabled;
-        this.setServerConfig(config);
-
-        const toggle = document.querySelector(`[data-log="${logType}"]`);
-        const select = document.querySelector(`select[data-log="${logType}"]`);
-
-        if (toggle) {
-            toggle.classList.toggle('active', config.logs[logType].enabled);
-        }
-
-        if (select) {
-            select.disabled = !config.logs[logType].enabled;
-        }
-
-        this.showNotification(
-            `${config.logs[logType].enabled ? '✅' : '❌'} Logs ${logType} ${config.logs[logType].enabled ? 'activés' : 'désactivés'}`,
-            'info'
-        );
-
-        this.markAsChanged();
+        config.levels.role_rewards.push({ level: 1, role: '' });
+        this.configurations.set(this.selectedGuild.id, config);
+        this.markAsChanged('levels.role_rewards');
+        this.renderLevelsTab();
     }
 
-    updateLogChannel(logType, channelId) {
-        const config = this.getServerConfig();
-        if (!config.logs) config.logs = {};
-        if (!config.logs[logType]) config.logs[logType] = { enabled: false };
-
-        config.logs[logType].channelId = channelId;
-        this.setServerConfig(config);
-
-        const channel = this.selectedServer.channels.find(c => c.id === channelId);
-        const channelName = channel?.name || 'salon inconnu';
-
-        this.showNotification(
-            `📝 Salon de logs ${logType} défini : #${channelName}`,
-            'info'
-        );
-
-        this.markAsChanged();
-    }
-
-    // ========== CONFIGURATION ==========
-    getServerConfig() {
-        return this.serverConfigs.get(this.selectedServer?.id) || {};
-    }
-
-    setServerConfig(config) {
-        if (this.selectedServer) {
-            this.serverConfigs.set(this.selectedServer.id, config);
+    updateRoleReward(index, field, value) {
+        const config = this.getCurrentConfig();
+        if (config.levels.role_rewards[index]) {
+            config.levels.role_rewards[index][field] = value;
+            this.configurations.set(this.selectedGuild.id, config);
+            this.markAsChanged('levels.role_rewards');
         }
     }
 
-    async loadServerConfiguration() {
-        if (!this.selectedServer?.yakoInstalled) return;
-
-        try {
-            const config = this.getServerConfig();
-            if (Object.keys(config).length === 0) {
-                this.setServerConfig({
-                    modules: {},
-                    permissions: {},
-                    channels: {},
-                    logs: {}
-                });
-            }
-
-            this.loadTabContent(this.currentTab);
-            console.log('✅ Configuration serveur chargée');
-        } catch (error) {
-            console.error('❌ Erreur chargement configuration:', error);
-            this.showNotification('⚠️ Impossible de charger la configuration du serveur', 'warning');
-        }
+    removeRoleReward(index) {
+        const config = this.getCurrentConfig();
+        config.levels.role_rewards.splice(index, 1);
+        this.configurations.set(this.selectedGuild.id, config);
+        this.markAsChanged('levels.role_rewards');
+        this.renderLevelsTab();
     }
+
+    updateBlacklistedChannels(select) {
+        const selectedChannels = Array.from(select.selectedOptions).map(option => option.value);
+        this.updateConfig('levels.blacklisted_channels', selectedChannels);
+    }
+
+    // ========== SAUVEGARDE ET RESET ==========
 
     async saveConfiguration() {
-        if (!this.selectedServer?.yakoInstalled) {
-            this.showNotification('❌ YAKO doit être installé pour sauvegarder', 'error');
-            return;
-        }
-
-        if (this.loadingStates.has('save')) return;
+        if (!this.selectedGuild || this.pendingChanges.size === 0) return;
 
         try {
-            this.setLoading('save', true);
-            this.showNotification('💾 Sauvegarde en cours...', 'info');
+            this.showLoading('Sauvegarde en cours...');
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Pour l'instant, on simule la sauvegarde
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            this.showNotification('✅ Configuration sauvegardée avec succès !', 'success');
-            this.markAsSaved();
+            this.pendingChanges.clear();
+            this.updateSaveButton();
+
+            this.showNotification('Configuration sauvegardée avec succès', 'success');
         } catch (error) {
             console.error('❌ Erreur sauvegarde:', error);
-            this.showNotification(`❌ Erreur lors de la sauvegarde: ${error.message}`, 'error');
+            this.showNotification('Erreur lors de la sauvegarde', 'error');
         } finally {
-            this.setLoading('save', false);
+            this.hideLoading();
         }
     }
 
-    async deployBot() {
-        if (!this.selectedServer) {
-            this.showNotification('❌ Aucun serveur sélectionné', 'error');
-            return;
-        }
-
-        if (!this.selectedServer.yakoInstalled) {
-            this.showModal(
-                'Installation requise',
-                `YAKO n'est pas encore installé sur "${this.selectedServer.name}". Voulez-vous l'inviter maintenant ?`,
-                () => this.inviteBotToServer()
-            );
-            return;
-        }
-
-        this.showModal(
-            'Déployer la configuration',
-            'Voulez-vous appliquer la configuration actuelle au bot ? Cette action redémarrera les modules modifiés.',
-            async () => {
-                if (this.loadingStates.has('deploy')) return;
-
-                try {
-                    this.setLoading('deploy', true);
-
-                    await this.saveConfiguration();
-
-                    this.showNotification('🚀 Déploiement en cours...', 'info');
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    this.showNotification('🚀 Configuration déployée avec succès !', 'success');
-                } catch (error) {
-                    console.error('❌ Erreur déploiement:', error);
-                    this.showNotification(`❌ Erreur lors du déploiement: ${error.message}`, 'error');
-                } finally {
-                    this.setLoading('deploy', false);
-                }
+    resetConfiguration() {
+        this.showConfirmModal(
+            'Réinitialiser la configuration',
+            'Êtes-vous sûr de vouloir remettre la configuration par défaut ? Toutes les modifications seront perdues.',
+            () => {
+                const defaultConfig = this.getDefaultConfig();
+                this.configurations.set(this.selectedGuild.id, defaultConfig);
+                this.pendingChanges.clear();
+                this.updateSaveButton();
+                this.renderCurrentTab();
+                this.showNotification('Configuration réinitialisée', 'info');
             }
         );
     }
 
-    // ========== UTILITAIRES ==========
-    async fetchWithTimeout(url, options = {}, timeout = 10000) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
+    previewConfiguration() {
+        const config = this.getCurrentConfig();
+        const previewContent = JSON.stringify(config, null, 2);
+
+        this.showModal('inviteModal', {
+            title: 'Aperçu de la configuration',
+            body: `<pre style="background: var(--background); padding: 1rem; border-radius: 4px; overflow: auto; max-height: 400px;"><code>${this.escapeHtml(previewContent)}</code></pre>`,
+            footer: '<button class="btn btn-secondary" onclick="configurator.hideModal()">Fermer</button>'
+        });
+    }
+
+    // ========== GESTION DE L'INTERFACE ==========
+
+    setupEventListeners() {
+        document.getElementById('loginBtn')?.addEventListener('click', () => this.login());
+        document.getElementById('ctaLogin')?.addEventListener('click', () => this.login());
+        document.getElementById('logoutBtn')?.addEventListener('click', () => this.logout());
+
+        document.getElementById('backBtn')?.addEventListener('click', () => this.showServerSelection());
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
+        });
+
+        document.getElementById('saveBtn')?.addEventListener('click', () => this.saveConfiguration());
+        document.getElementById('resetBtn')?.addEventListener('click', () => this.resetConfiguration());
+        document.getElementById('previewBtn')?.addEventListener('click', () => this.previewConfiguration());
+
+        document.getElementById('closeInviteModal')?.addEventListener('click', () => this.hideModal());
+        document.getElementById('cancelInvite')?.addEventListener('click', () => this.hideModal());
+        document.getElementById('cancelConfirm')?.addEventListener('click', () => this.hideModal());
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) this.hideModal();
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') this.hideModal();
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                this.saveConfiguration();
+            }
+        });
+    }
+
+    updateAuthUI() {
+        const navUser = document.getElementById('navUser');
+        const loginBtn = document.getElementById('loginBtn');
+        const userAvatar = document.getElementById('userAvatar');
+        const username = document.getElementById('username');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+
+        if (this.isAuthenticated && this.currentUser) {
+            if (navUser) navUser.style.display = 'flex';
+            if (loginBtn) loginBtn.style.display = 'none';
+
+            const avatarUrl = this.currentUser.avatar
+                ? `https://cdn.discordapp.com/avatars/${this.currentUser.id}/${this.currentUser.avatar}.png?size=128`
+                : `https://cdn.discordapp.com/embed/avatars/${this.currentUser.discriminator % 5}.png`;
+
+            if (userAvatar) userAvatar.style.backgroundImage = `url(${avatarUrl})`;
+            if (username) username.textContent = this.currentUser.username;
+
+            if (statusIndicator) statusIndicator.className = 'status-indicator online';
+            if (statusText) statusText.textContent = 'En ligne';
+        } else {
+            if (navUser) navUser.style.display = 'none';
+            if (loginBtn) loginBtn.style.display = 'inline-flex';
+
+            if (statusIndicator) statusIndicator.className = 'status-indicator offline';
+            if (statusText) statusText.textContent = 'Hors ligne';
+        }
+    }
+
+    updateServerHeader() {
+        if (!this.selectedGuild) return;
+
+        const serverAvatar = document.getElementById('serverAvatar');
+        const serverName = document.getElementById('serverName');
+        const serverMembers = document.getElementById('serverMembers');
+        const botStatus = document.getElementById('botStatus');
+
+        const iconUrl = this.selectedGuild.icon
+            ? `https://cdn.discordapp.com/icons/${this.selectedGuild.id}/${this.selectedGuild.icon}.png?size=128`
+            : null;
+
+        if (iconUrl) {
+            serverAvatar.style.backgroundImage = `url(${iconUrl})`;
+            serverAvatar.textContent = '';
+        } else {
+            serverAvatar.style.backgroundImage = 'none';
+            serverAvatar.textContent = this.selectedGuild.name.charAt(0).toUpperCase();
+        }
+
+        serverName.textContent = this.selectedGuild.name;
+
+        // Afficher le nombre de membres formaté
+        const memberCount = this.selectedGuild.member_count || this.selectedGuild.approximate_member_count || 0;
+        serverMembers.textContent = this.formatMemberCount(memberCount);
+
+        // Mettre à jour le statut du bot
+        if (this.selectedGuild.bot_installed) {
+            botStatus.className = 'bot-status online';
+            botStatus.innerHTML = '<i class="fas fa-circle"></i><span>Bot en ligne</span>';
+
+            // Afficher des informations supplémentaires si disponibles
+            if (this.selectedGuild.channels) {
+                const textChannels = this.selectedGuild.text_channels?.length || this.selectedGuild.channels.filter(c => c.type === 0).length;
+                const voiceChannels = this.selectedGuild.voice_channels?.length || this.selectedGuild.channels.filter(c => c.type === 2).length;
+                console.log(`📊 Serveur ${this.selectedGuild.name}: ${textChannels} salons texte, ${voiceChannels} salons vocaux`);
+            }
+        } else {
+            botStatus.className = 'bot-status offline';
+            botStatus.innerHTML = '<i class="fas fa-circle"></i><span>Bot non installé</span>';
+        }
+    }
+
+    switchTab(tabName) {
+        this.currentTab = tabName;
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.toggle('active', pane.id === `${tabName}-tab`);
+        });
+
+        this.renderCurrentTab();
+    }
+
+    renderCurrentTab() {
+        switch (this.currentTab) {
+            case 'features':
+                this.renderFeaturesTab();
+                break;
+            case 'moderation':
+                this.renderModerationTab();
+                break;
+            case 'music':
+                this.renderMusicTab();
+                break;
+            case 'levels':
+                this.renderLevelsTab();
+                break;
+            case 'logs':
+                this.renderLogsTab();
+                break;
+        }
+    }
+
+    showWelcomePage() {
+        console.log('📄 Affichage de la page d\'accueil');
+        document.getElementById('welcomePage').style.display = 'block';
+        document.getElementById('serverSelection').style.display = 'none';
+        document.getElementById('serverConfig').style.display = 'none';
+    }
+
+    showServerSelection() {
+        console.log('🏰 Affichage de la sélection de serveur');
+        document.getElementById('welcomePage').style.display = 'none';
+        document.getElementById('serverSelection').style.display = 'block';
+        document.getElementById('serverConfig').style.display = 'none';
+        this.renderServers();
+    }
+
+    showServerConfig() {
+        console.log('⚙️ Affichage de la configuration serveur');
+        document.getElementById('welcomePage').style.display = 'none';
+        document.getElementById('serverSelection').style.display = 'none';
+        document.getElementById('serverConfig').style.display = 'block';
+    }
+
+    // ========== MODALES ET NOTIFICATIONS ==========
+
+    showModal(modalId, options = {}) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        if (options.title) {
+            const titleEl = modal.querySelector('.modal-header h3');
+            if (titleEl) titleEl.textContent = options.title;
+        }
+
+        if (options.body) {
+            const bodyEl = modal.querySelector('.modal-body');
+            if (bodyEl) bodyEl.innerHTML = options.body;
+        }
+
+        if (options.footer) {
+            const footerEl = modal.querySelector('.modal-footer');
+            if (footerEl) footerEl.innerHTML = options.footer;
+        }
+
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('show'));
+    }
+
+    hideModal() {
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        });
+    }
+
+    showConfirmModal(title, message, onConfirm) {
+        const modal = document.getElementById('confirmModal');
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+
+        const confirmBtn = document.getElementById('confirmAction');
+        confirmBtn.onclick = () => {
+            onConfirm();
+            this.hideModal();
+        };
+
+        this.showModal('confirmModal');
+    }
+
+    showNotification(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('notificationsContainer');
+        if (!container) return;
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        const icons = {
+            success: 'fas fa-check-circle',
+            error: 'fas fa-exclamation-circle',
+            warning: 'fas fa-exclamation-triangle',
+            info: 'fas fa-info-circle'
+        };
+
+        notification.innerHTML = `
+            <div class="notification-icon">
+                <i class="${icons[type] || icons.info}"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-message">${this.escapeHtml(message)}</div>
+            </div>
+        `;
+
+        container.appendChild(notification);
+
+        requestAnimationFrame(() => notification.classList.add('show'));
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, duration);
+    }
+
+    showLoading(message = 'Chargement...') {
+        const overlay = document.getElementById('loadingOverlay');
+        const text = document.getElementById('loadingText');
+
+        if (overlay && text) {
+            text.textContent = message;
+            overlay.style.display = 'flex';
+        }
+    }
+
+    hideLoading() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    // ========== API ==========
+
+    async apiCall(endpoint, method = 'GET', data = null) {
+        const url = `${this.apiBaseUrl}${endpoint}`;
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        console.log(`🌐 API Call: ${method} ${url}`);
 
         try {
-            const response = await fetch(url, {
-                ...options,
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-            return response;
-        } catch (error) {
-            clearTimeout(timeoutId);
-            if (error.name === 'AbortError') {
-                throw new Error('Timeout de la requête');
+            const response = await fetch(url, options);
+            const result = await response.json();
+
+            console.log(`📨 API Response (${response.status}):`, result);
+
+            if (!response.ok) {
+                throw new Error(result.error || `Erreur ${response.status}: ${response.statusText}`);
             }
+
+            return result;
+        } catch (error) {
+            console.error(`❌ Erreur API ${method} ${endpoint}:`, error);
             throw error;
         }
     }
 
-    setLoading(action, isLoading) {
-        if (isLoading) {
-            this.loadingStates.add(action);
-        } else {
-            this.loadingStates.delete(action);
+    handleUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.get('success') === 'true') {
+            this.showNotification('Connexion Discord réussie !', 'success');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            setTimeout(() => this.checkAuthStatus(), 1000);
         }
 
-        this.updateLoadingButtons();
-    }
+        if (urlParams.get('error')) {
+            const error = urlParams.get('error');
+            let message = 'Erreur de connexion Discord';
 
-    updateLoadingButtons() {
-        const buttons = {
-            'connect': ['connectDiscordBtn', 'connectButton'],
-            'disconnect': ['disconnectBtn'],
-            'save': ['saveConfig'],
-            'deploy': ['deployConfig'],
-            'invite': []
-        };
-
-        Object.entries(buttons).forEach(([action, buttonIds]) => {
-            const isLoading = this.loadingStates.has(action);
-            buttonIds.forEach(buttonId => {
-                const button = document.getElementById(buttonId);
-                if (button) {
-                    button.disabled = isLoading;
-                    button.style.opacity = isLoading ? '0.6' : '1';
-                    button.style.cursor = isLoading ? 'not-allowed' : 'pointer';
-                }
-            });
-        });
-    }
-
-    showNotification(message, type = 'info', duration = 4000) {
-        document.querySelectorAll('.notification').forEach(notif => notif.remove());
-
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-
-        Object.assign(notification.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            color: 'white',
-            fontWeight: '500',
-            zIndex: '10000',
-            maxWidth: '400px',
-            wordWrap: 'break-word',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            transform: 'translateX(100%)',
-            transition: 'transform 0.3s ease'
-        });
-
-        const colors = {
-            success: '#43a047',
-            error: '#e53e3e',
-            warning: '#ff9800',
-            info: '#2196f3'
-        };
-        notification.style.backgroundColor = colors[type] || colors.info;
-
-        document.body.appendChild(notification);
-
-        requestAnimationFrame(() => {
-            notification.style.transform = 'translateX(0)';
-        });
-
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => notification.remove(), 300);
-        }, duration);
-
-        console.log(`📢 Notification ${type}: ${message}`);
-    }
-
-    showModal(title, message, onConfirm) {
-        const modal = document.getElementById('modalOverlay');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalMessage = document.getElementById('modalMessage');
-
-        if (modal && modalTitle && modalMessage) {
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            modal.style.display = 'flex';
-
-            this.pendingModalAction = onConfirm;
-
-            requestAnimationFrame(() => {
-                modal.style.opacity = '1';
-                const modalEl = modal.querySelector('.modal');
-                if (modalEl) {
-                    modalEl.style.transform = 'scale(1)';
-                }
-            });
-        }
-    }
-
-    hideModal() {
-        const modal = document.getElementById('modalOverlay');
-        if (modal) {
-            modal.style.opacity = '0';
-            const modalEl = modal.querySelector('.modal');
-            if (modalEl) {
-                modalEl.style.transform = 'scale(0.95)';
+            switch (error) {
+                case 'invalid_state':
+                    message = 'État de sécurité invalide - Réessayez';
+                    break;
+                case 'no_code':
+                    message = 'Code d\'autorisation manquant';
+                    break;
+                case 'invalid_grant':
+                    message = 'Autorisation expirée - Reconnectez-vous';
+                    break;
+                case 'discord_oauth_error':
+                    message = 'Erreur d\'autorisation Discord';
+                    break;
+                case 'auth_failed':
+                    message = 'Échec de l\'authentification Discord';
+                    break;
             }
 
-            setTimeout(() => {
-                modal.style.display = 'none';
-                this.pendingModalAction = null;
-            }, 200);
+            this.showNotification(message, 'error');
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
 
-    confirmModalAction() {
-        if (this.pendingModalAction && typeof this.pendingModalAction === 'function') {
-            this.pendingModalAction();
-        }
-        this.hideModal();
-    }
+    // ========== UTILITAIRES ==========
 
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-
-    getNotInstalledMessage(message) {
-        return `
-            <div class="status-message not-installed">
-                <i class="fas fa-robot"></i>
-                <h3>YAKO non installé</h3>
-                <p>${message}</p>
-                <button class="invite-bot-btn" onclick="discordConfig.inviteBotToServer()">
-                    <i class="fas fa-plus"></i>
-                    Inviter YAKO
-                </button>
-            </div>
-        `;
-    }
-
-    getLoadingMessage(message) {
-        return `
-            <div class="status-message loading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>${message}</p>
-            </div>
-        `;
-    }
-
-    getEmptyMessage(message) {
-        return `
-            <div class="status-message empty">
-                <i class="fas fa-inbox"></i>
-                <p>${message}</p>
-            </div>
-        `;
-    }
-
-    markAsChanged() {
-        this.hasUnsavedChanges = true;
-
-        const saveButton = document.getElementById('saveConfig');
-        if (saveButton && !saveButton.classList.contains('has-changes')) {
-            saveButton.classList.add('has-changes');
-            saveButton.style.backgroundColor = '#ff9800';
-        }
-    }
-
-    markAsSaved() {
-        this.hasUnsavedChanges = false;
-
-        const saveButton = document.getElementById('saveConfig');
-        if (saveButton) {
-            saveButton.classList.remove('has-changes');
-            saveButton.style.backgroundColor = '';
-        }
-    }
 }
 
-// ========== INITIALISATION GLOBALE ==========
-let discordConfig;
+// ========== INITIALISATION ==========
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        discordConfig = new DiscordConfigurator();
-        await discordConfig.init();
+let configurator;
 
-        console.log('🎉 YAKO Configurateur prêt !');
-        window.discordConfig = discordConfig;
-    } catch (error) {
-        console.error('❌ Erreur d\'initialisation:', error);
-
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'init-error';
-        errorDiv.innerHTML = `
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Erreur d'initialisation</h3>
-            <p>Une erreur s'est produite lors du chargement du configurateur.</p>
-            <button onclick="location.reload()">Recharger la page</button>
-        `;
-        Object.assign(errorDiv.style, {
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: '#f8f9fa',
-            color: '#495057',
-            padding: '30px',
-            borderRadius: '12px',
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            zIndex: '10000'
-        });
-
-        document.body.appendChild(errorDiv);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Initialisation du configurateur...');
+    configurator = new BotConfigurator();
+    window.configurator = configurator;
 });
 
-window.addEventListener('beforeunload', (e) => {
-    if (discordConfig?.hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = 'Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter ?';
+window.addEventListener('error', (e) => {
+    console.error('❌ Erreur globale:', e.error);
+    if (configurator) {
+        configurator.showNotification('Une erreur inattendue s\'est produite', 'error');
     }
 });
 
 window.addEventListener('online', () => {
-    if (discordConfig && !discordConfig.isConnected) {
-        discordConfig.checkAuthStatus();
+    if (configurator && !configurator.isAuthenticated) {
+        configurator.checkAuthStatus();
     }
 });
 
 window.addEventListener('offline', () => {
-    if (discordConfig) {
-        discordConfig.showNotification('🌐 Connexion internet perdue', 'warning');
+    if (configurator) {
+        configurator.showNotification('Connexion internet perdue', 'warning');
     }
 });
 
-window.DiscordConfigurator = DiscordConfigurator;
+window.addEventListener('beforeunload', (e) => {
+    if (configurator && configurator.pendingChanges.size > 0) {
+        e.preventDefault();
+        e.returnValue = 'Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter ?';
+    }
+});

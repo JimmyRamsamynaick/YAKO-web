@@ -1,0 +1,51 @@
+// ========== REDIRECTION VERS LE CONFIGURATEUR (MODIFIÉ) ==========
+function initConfiguratorRedirect() {
+    // Sélectionner le bouton du configurateur
+    const configuratorButton = document.querySelector('.btn-configurator');
+
+    if (configuratorButton) {
+        // Remplacer le comportement du bouton
+        configuratorButton.disabled = false;
+        configuratorButton.classList.remove('disabled');
+        configuratorButton.innerHTML = `
+            <i class="fas fa-external-link-alt"></i>
+            Ouvrir le Configurateur
+        `;
+
+        // Ajouter l'événement de clic pour ouvrir dans un nouvel onglet
+        configuratorButton.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Animation de clic
+            configuratorButton.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                configuratorButton.style.transform = 'scale(1)';
+            }, 150);
+
+            // Notification de redirection
+            showNotification('🔧 Ouverture du configurateur dans un nouvel onglet...', 'info', 2000);
+
+            // Ouvrir dans un nouvel onglet avec délai pour l'animation
+            setTimeout(() => {
+                window.open('configurateur.html', '_blank');
+            }, 300);
+
+            console.log('🔧 Ouverture du configurateur dans un nouvel onglet');
+        });
+
+        // Effets hover
+        configuratorButton.addEventListener('mouseenter', () => {
+            configuratorButton.style.background = 'linear-gradient(135deg, #5a6fd8, #6d28d9)';
+            configuratorButton.style.transform = 'translateY(-2px)';
+            configuratorButton.style.boxShadow = '0 10px 20px rgba(102, 126, 234, 0.3)';
+        });
+
+        configuratorButton.addEventListener('mouseleave', () => {
+            configuratorButton.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            configuratorButton.style.transform = 'translateY(0)';
+            configuratorButton.style.boxShadow = 'none';
+        });
+
+        console.log('✅ Redirection vers le configurateur initialisée (nouvel onglet)');
+    }
+}

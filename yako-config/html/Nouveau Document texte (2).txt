@@ -1,0 +1,47 @@
+<!-- Section Configuration personnalisée - MODIFIÉE -->
+<section class="bot-configurator">
+  <div class="container">
+    <h2><i class="fas fa-wrench"></i> Configurateur de Bot</h2>
+    <div class="configurator-content">
+      <div class="configurator-info">
+        <h3>Personnalisez votre YAKO</h3>
+        <p>Configurez facilement toutes les fonctionnalités de YAKO directement depuis votre navigateur pour chacun de vos serveurs Discord.</p>
+        <div class="maintenance-notice">
+          <i class="fas fa-rocket"></i>
+          <div>
+            <h4>🎉 Configurateur disponible</h4>
+            <p>Le configurateur web de YAKO est maintenant <strong>disponible en version bêta</strong> ! Vous pouvez dès maintenant configurer votre bot facilement depuis votre navigateur.</p>
+          </div>
+        </div>
+      </div>
+      <div class="configurator-panel">
+        <div class="config-header">
+          <h4>Configuration en ligne</h4>
+          <span class="maintenance-badge">Bêta</span>
+        </div>
+        <div class="config-preview">
+          <div class="preview-item">
+            <i class="fas fa-link"></i>
+            <span>Connexion Discord sécurisée</span>
+          </div>
+          <div class="preview-item">
+            <i class="fas fa-server"></i>
+            <span>Sélection de vos serveurs</span>
+          </div>
+          <div class="preview-item">
+            <i class="fas fa-cogs"></i>
+            <span>Configuration des modules</span>
+          </div>
+          <div class="preview-item">
+            <i class="fas fa-save"></i>
+            <span>Sauvegarde automatique</span>
+          </div>
+        </div>
+        <button class="btn-configurator">
+          <i class="fas fa-external-link-alt"></i>
+          Ouvrir le Configurateur
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -3,194 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YAKO Configurateur - Discord Bot</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../html/configurator.css">
+    <title>YAKO Bot - Configurateur</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="configurator.css">
 </head>
 <body>
-<!-- Layout principal Discord-like -->
-<div class="discord-layout">
-    <!-- Sidebar gauche avec serveurs -->
-    <div class="servers-sidebar">
-        <!-- Logo YAKO -->
-        <div class="yako-home" id="yakoHome" title="YAKO Configurateur">
-            <i class="fas fa-robot"></i>
-        </div>
-
-        <!-- Séparateur -->
-        <div class="server-separator"></div>
-
-        <!-- Serveurs (seront chargés dynamiquement) -->
-        <div class="servers-list" id="serversList">
-            <!-- Les serveurs apparaîtront ici après connexion Discord réelle -->
-        </div>
-
-        <!-- Bouton d'ajout/connexion -->
-        <div class="server-icon add-server" id="connectButton" title="Se connecter à Discord">
-            <i class="fas fa-plus"></i>
-        </div>
-    </div>
-
-    <!-- Zone principale -->
-    <div class="main-content">
-        <!-- Barre de titre -->
-        <div class="title-bar">
-            <div class="server-info">
-                <div class="server-name" id="currentServerName">YAKO Configurateur</div>
-                <div class="server-status" id="serverStatus">Connectez-vous pour commencer</div>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <div class="bot-logo">
+                <i class="fas fa-robot"></i>
             </div>
-            <div class="user-info" id="userInfo" style="display: none;">
-                <div class="user-avatar" id="userAvatar"></div>
-                <div class="user-details">
-                    <div class="username" id="username"></div>
-                    <div class="user-status">En ligne</div>
+            <span class="brand-name">YAKO Bot</span>
+        </div>
+
+        <div class="nav-user" id="navUser" style="display: none;">
+            <div class="user-avatar" id="userAvatar"></div>
+            <span class="username" id="username"></span>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+
+        <button class="login-btn" id="loginBtn">
+            <i class="fab fa-discord"></i>
+            Se connecter
+        </button>
+    </div>
+</nav>
+
+<!-- État de connexion -->
+<div class="connection-status" id="connectionStatus">
+    <div class="status-indicator offline" id="statusIndicator">
+        <i class="fas fa-circle"></i>
+    </div>
+    <span id="statusText">Hors ligne</span>
+</div>
+
+<!-- Contenu principal -->
+<main class="main-content">
+    <!-- Page d'accueil -->
+    <div class="welcome-page" id="welcomePage">
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="hero-icon">
+                    <i class="fas fa-robot"></i>
                 </div>
-                <button class="disconnect-btn" id="disconnectBtn" title="Se déconnecter">
-                    <i class="fas fa-sign-out-alt"></i>
+                <h1>Configurateur YAKO Bot</h1>
+                <p>Gérez facilement les fonctionnalités de votre bot Discord sur vos serveurs</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-cogs"></i>
+                        <h3>Configuration facile</h3>
+                        <p>Interface intuitive pour configurer toutes les fonctionnalités</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Modération avancée</h3>
+                        <p>Outils de modération automatique et personnalisable</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-music"></i>
+                        <h3>Musique de qualité</h3>
+                        <p>Lecteur musical avec support des plateformes populaires</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Système de niveaux</h3>
+                        <p>Gamification pour encourager l'activité de vos membres</p>
+                    </div>
+                </div>
+
+                <button class="cta-button" id="ctaLogin">
+                    <i class="fab fa-discord"></i>
+                    Commencer avec Discord
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Contenu principal -->
-        <div class="content-area">
-            <!-- État initial (non connecté) -->
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-content">
-                    <div class="yako-logo">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h1>Configurateur Discord YAKO</h1>
-                    <p>Connectez-vous avec votre compte Discord pour configurer YAKO sur vos serveurs où vous êtes administrateur</p>
+    <!-- Sélection de serveur -->
+    <div class="server-selection" id="serverSelection" style="display: none;">
+        <div class="page-header">
+            <h1>Sélectionnez un serveur</h1>
+            <p>Choisissez le serveur Discord que vous souhaitez configurer</p>
+        </div>
 
-                    <div class="features-preview">
-                        <div class="feature-item">
-                            <i class="fas fa-server"></i>
-                            <span>Voir vos serveurs Discord</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-cogs"></i>
-                            <span>Configurer les modules YAKO</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Gérer les permissions</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-rocket"></i>
-                            <span>Inviter YAKO facilement</span>
-                        </div>
-                    </div>
+        <div class="servers-grid" id="serversGrid">
+            <!-- Les serveurs seront chargés ici -->
+        </div>
+    </div>
 
-                    <button class="connect-discord-btn" id="connectDiscordBtn">
-                        <i class="fab fa-discord"></i>
-                        Se connecter avec Discord
-                    </button>
+    <!-- Configuration du serveur -->
+    <div class="server-config" id="serverConfig" style="display: none;">
+        <!-- En-tête du serveur -->
+        <div class="server-header">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+                Retour
+            </button>
 
-                    <div class="security-note">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Connexion sécurisée via Discord OAuth2</span>
-                    </div>
+            <div class="server-info">
+                <div class="server-avatar" id="serverAvatar"></div>
+                <div class="server-details">
+                    <h2 id="serverName">Nom du serveur</h2>
+                    <p id="serverMembers">0 membres</p>
                 </div>
             </div>
 
-            <!-- Zone de configuration (masquée au début) -->
-            <div class="config-area" id="configArea" style="display: none;">
-                <!-- Onglets de configuration -->
-                <div class="config-tabs">
-                    <button class="config-tab active" data-tab="modules">
-                        <i class="fas fa-puzzle-piece"></i>
-                        Modules
-                    </button>
-                    <button class="config-tab" data-tab="permissions">
-                        <i class="fas fa-user-shield"></i>
-                        Permissions
-                    </button>
-                    <button class="config-tab" data-tab="channels">
-                        <i class="fas fa-hashtag"></i>
-                        Salons
-                    </button>
-                    <button class="config-tab" data-tab="logs">
-                        <i class="fas fa-clipboard-list"></i>
-                        Logs
-                    </button>
+            <div class="bot-status" id="botStatus">
+                <i class="fas fa-circle"></i>
+                <span>Non installé</span>
+            </div>
+        </div>
+
+        <!-- Navigation des onglets -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="features">
+                <i class="fas fa-puzzle-piece"></i>
+                Fonctionnalités
+            </button>
+            <button class="tab-btn" data-tab="moderation">
+                <i class="fas fa-shield-alt"></i>
+                Modération
+            </button>
+            <button class="tab-btn" data-tab="music">
+                <i class="fas fa-music"></i>
+                Musique
+            </button>
+            <button class="tab-btn" data-tab="levels">
+                <i class="fas fa-trophy"></i>
+                Niveaux
+            </button>
+            <button class="tab-btn" data-tab="logs">
+                <i class="fas fa-clipboard-list"></i>
+                Logs
+            </button>
+        </div>
+
+        <!-- Contenu des onglets -->
+        <div class="tab-content">
+            <!-- Onglet Fonctionnalités -->
+            <div class="tab-pane active" id="features-tab">
+                <div class="section-header">
+                    <h3>Fonctionnalités générales</h3>
+                    <p>Activez ou désactivez les modules principaux du bot</p>
                 </div>
 
-                <!-- Contenu des onglets -->
-                <div class="tab-content">
-                    <!-- Onglet Modules -->
-                    <div class="tab-pane active" id="modules-tab">
-                        <div class="modules-grid" id="modulesGrid">
-                            <div class="status-message not-installed">
-                                <i class="fas fa-robot"></i>
-                                <h3>Connexion requise</h3>
-                                <p>Connectez-vous avec Discord pour voir vos serveurs et configurer YAKO</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Onglet Permissions -->
-                    <div class="tab-pane" id="permissions-tab">
-                        <div class="permissions-list" id="permissionsList">
-                            <div class="status-message not-installed">
-                                <i class="fas fa-user-shield"></i>
-                                <h3>Connexion requise</h3>
-                                <p>Connectez-vous pour configurer les permissions</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Onglet Salons -->
-                    <div class="tab-pane" id="channels-tab">
-                        <div class="channels-list" id="channelsList">
-                            <div class="status-message not-installed">
-                                <i class="fas fa-hashtag"></i>
-                                <h3>Connexion requise</h3>
-                                <p>Connectez-vous pour configurer les salons</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Onglet Logs -->
-                    <div class="tab-pane" id="logs-tab">
-                        <div class="logs-config" id="logsConfig">
-                            <div class="status-message not-installed">
-                                <i class="fas fa-clipboard-list"></i>
-                                <h3>Connexion requise</h3>
-                                <p>Connectez-vous pour configurer les logs</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Zone de sauvegarde -->
-                <div class="save-area">
-                    <button class="btn save-btn" id="saveConfig">
-                        <i class="fas fa-save"></i>
-                        Sauvegarder la configuration
-                    </button>
-                    <button class="btn deploy-btn" id="deployConfig">
-                        <i class="fas fa-rocket"></i>
-                        Inviter/Déployer YAKO
-                    </button>
+                <div class="features-list" id="featuresList">
+                    <!-- Sera rempli par JavaScript -->
                 </div>
             </div>
+
+            <!-- Onglet Modération -->
+            <div class="tab-pane" id="moderation-tab">
+                <div class="section-header">
+                    <h3>Configuration de la modération</h3>
+                    <p>Personnalisez les outils de modération automatique</p>
+                </div>
+
+                <div class="config-sections" id="moderationConfig">
+                    <!-- Sera rempli par JavaScript -->
+                </div>
+            </div>
+
+            <!-- Onglet Musique -->
+            <div class="tab-pane" id="music-tab">
+                <div class="section-header">
+                    <h3>Configuration musicale</h3>
+                    <p>Paramètres du lecteur musical</p>
+                </div>
+
+                <div class="config-sections" id="musicConfig">
+                    <!-- Sera rempli par JavaScript -->
+                </div>
+            </div>
+
+            <!-- Onglet Niveaux -->
+            <div class="tab-pane" id="levels-tab">
+                <div class="section-header">
+                    <h3>Système de niveaux</h3>
+                    <p>Configuration du système XP et récompenses</p>
+                </div>
+
+                <div class="config-sections" id="levelsConfig">
+                    <!-- Sera rempli par JavaScript -->
+                </div>
+            </div>
+
+            <!-- Onglet Logs -->
+            <div class="tab-pane" id="logs-tab">
+                <div class="section-header">
+                    <h3>Journaux d'activité</h3>
+                    <p>Configuration des logs pour surveiller l'activité du serveur</p>
+                </div>
+
+                <div class="config-sections" id="logsConfig">
+                    <!-- Sera rempli par JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-bar">
+            <button class="btn btn-secondary" id="resetBtn">
+                <i class="fas fa-undo"></i>
+                Réinitialiser
+            </button>
+
+            <div class="primary-actions">
+                <button class="btn btn-outline" id="previewBtn">
+                    <i class="fas fa-eye"></i>
+                    Aperçu
+                </button>
+                <button class="btn btn-primary" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    Sauvegarder
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal d'invitation du bot -->
+<div class="modal-overlay" id="inviteModal" style="display: none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Inviter YAKO Bot</h3>
+            <button class="modal-close" id="closeInviteModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="invite-info">
+                <div class="bot-avatar-large">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h4>YAKO Bot souhaite rejoindre votre serveur</h4>
+                <p>Les permissions suivantes seront accordées :</p>
+
+                <div class="permissions-list">
+                    <div class="permission-item">
+                        <i class="fas fa-check"></i>
+                        <span>Lire et envoyer des messages</span>
+                    </div>
+                    <div class="permission-item">
+                        <i class="fas fa-check"></i>
+                        <span>Gérer les messages</span>
+                    </div>
+                    <div class="permission-item">
+                        <i class="fas fa-check"></i>
+                        <span>Se connecter et parler en vocal</span>
+                    </div>
+                    <div class="permission-item">
+                        <i class="fas fa-check"></i>
+                        <span>Utiliser les slash commands</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelInvite">Annuler</button>
+            <button class="btn btn-success" id="confirmInvite">
+                <i class="fas fa-plus"></i>
+                Inviter le bot
+            </button>
         </div>
     </div>
 </div>
 
 <!-- Modal de confirmation -->
-<div class="modal-overlay" id="modalOverlay" style="display: none;">
+<div class="modal-overlay" id="confirmModal" style="display: none;">
     <div class="modal">
-        <h3 id="modalTitle"></h3>
-        <p id="modalMessage"></p>
-        <div class="modal-actions">
-            <button class="btn btn-secondary" id="modalCancel">Annuler</button>
-            <button class="btn btn-primary" id="modalConfirm">Confirmer</button>
+        <div class="modal-header">
+            <h3 id="confirmTitle">Confirmation</h3>
+        </div>
+
+        <div class="modal-body">
+            <p id="confirmMessage">Êtes-vous sûr de vouloir effectuer cette action ?</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelConfirm">Annuler</button>
+            <button class="btn btn-primary" id="confirmAction">Confirmer</button>
         </div>
     </div>
 </div>
 
-<!-- Script JavaScript -->
-<script src="../html/configurator.js"></script>
+<!-- Notifications -->
+<div class="notifications-container" id="notificationsContainer"></div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner">
+        <i class="fas fa-circle-notch fa-spin"></i>
+        <p id="loadingText">Chargement...</p>
+    </div>
+</div>
+
+<script src="configurator.js"></script>
 </body>
 </html>
