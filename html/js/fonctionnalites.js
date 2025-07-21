@@ -1,4 +1,4 @@
-// JavaScript pour la page fonctionnalités - Version complète corrigée
+// JavaScript pour la page fonctionnalités - Version complète et corrigée
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🤖 YAKO Fonctionnalités - Initialisation...');
 
@@ -442,11 +442,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Copie des commandes initialisée');
     }
 
-    // ========== ANIMATIONS AU SCROLL ==========
+    // ========== ANIMATIONS AU SCROLL (OPTIMISÉES) ==========
     function initScrollAnimations() {
         const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.05,
+            rootMargin: '50px 0px -20px 0px'
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -456,21 +456,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         entry.target.style.opacity = '1';
                         entry.target.style.transform = 'translateY(0)';
                         entry.target.classList.add('animate-in');
-                    }, index * 100);
+                    }, index * 50);
                 }
             });
         }, observerOptions);
 
-        // Observer tous les éléments animables
-        const elementsToAnimate = document.querySelectorAll('.feature-card, .command-category, .step, .preview-item');
+        // Observer tous les éléments animables SAUF les preview-item
+        const elementsToAnimate = document.querySelectorAll('.feature-card, .command-category, .step');
         elementsToAnimate.forEach((element, index) => {
             element.style.opacity = '0';
-            element.style.transform = 'translateY(30px)';
-            element.style.transition = `opacity 0.6s ease ${index * 0.05}s, transform 0.6s ease ${index * 0.05}s`;
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = `opacity 0.4s ease ${index * 0.02}s, transform 0.4s ease ${index * 0.02}s`;
             observer.observe(element);
         });
 
-        console.log('✅ Animations au scroll initialisées');
+        console.log('✅ Animations au scroll optimisées');
     }
 
     // ========== EFFECT MACHINE À ÉCRIRE POUR LES COMMANDES ==========
@@ -619,42 +619,22 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification(helpHTML, 'info', 8000);
     }
 
-    // ========== REDIRECTION VERS LE CONFIGURATEUR ==========
-    function initConfiguratorRedirect() {
-        // Sélectionner le bouton du configurateur
+    // ========== GESTION DU BOUTON CONFIGURATEUR (CORRIGÉ) ==========
+    function initConfiguratorButton() {
         const configuratorButton = document.querySelector('.btn-configurator');
 
         if (configuratorButton) {
-            // Remplacer le comportement du bouton
+            // S'assurer que le bouton est activé
             configuratorButton.disabled = false;
             configuratorButton.classList.remove('disabled');
+
+            // Mise à jour du contenu du bouton
             configuratorButton.innerHTML = `
                 <i class="fas fa-wrench"></i>
                 Accéder au Configurateur
             `;
 
-            // Ajouter l'événement de clic
-            configuratorButton.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                // Animation de clic
-                configuratorButton.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    configuratorButton.style.transform = 'scale(1)';
-                }, 150);
-
-                // Notification de redirection
-                showNotification('🔧 Redirection vers le configurateur...', 'info', 2000);
-
-                // Redirection avec délai pour l'animation
-                setTimeout(() => {
-                    window.location.href = 'configurator.html';
-                }, 300);
-
-                console.log('🔧 Redirection vers le configurateur');
-            });
-
-            // Effets hover
+            // Ajouter les effets visuels
             configuratorButton.addEventListener('mouseenter', () => {
                 configuratorButton.style.background = 'linear-gradient(135deg, #5a6fd8, #6d28d9)';
                 configuratorButton.style.transform = 'translateY(-2px)';
@@ -667,7 +647,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 configuratorButton.style.boxShadow = 'none';
             });
 
-            console.log('✅ Redirection vers le configurateur initialisée');
+            // Événement de clic avec redirection vers le fichier local
+            configuratorButton.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Animation de clic
+                configuratorButton.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    configuratorButton.style.transform = 'scale(1)';
+                }, 150);
+
+                // Notification
+                showNotification('🔧 Ouverture du configurateur...', 'info', 2000);
+
+                // Redirection vers le fichier local
+                setTimeout(() => {
+                    window.open('file:///C:/Users/jimmy/Downloads/YAKO-web/yako-config/html/configurateur.html', '_blank');
+                }, 300);
+
+                console.log('🔧 Ouverture du configurateur local');
+            });
+
+            console.log('✅ Bouton configurateur initialisé');
         }
     }
 
@@ -806,7 +807,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initTypewriterEffect();
         initStateManagement();
         initKeyboardShortcuts();
-        initConfiguratorRedirect();
+        initConfiguratorButton();
 
         console.log('✅ YAKO Fonctionnalités - Toutes les fonctionnalités initialisées');
 
@@ -844,22 +845,23 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// ========== STYLES DYNAMIQUES POUR LES ANIMATIONS ==========
+// ========== STYLES DYNAMIQUES OPTIMISÉS ==========
 const functionalitiesStyles = document.createElement('style');
 functionalitiesStyles.textContent = `
+    /* Animations plus rapides et fluides */
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
+        from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     .animate-in {
-        animation: fadeInUp 0.6s ease forwards;
+        animation: fadeInUp 0.4s ease forwards;
     }
 
     @keyframes fadeInUp {
         from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
         }
         to {
             opacity: 1;
@@ -867,6 +869,79 @@ functionalitiesStyles.textContent = `
         }
     }
 
+    /* Assurer que les éléments du configurateur apparaissent immédiatement */
+    .bot-configurator .preview-item,
+    .config-preview .preview-item {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+        transition: background-color 0.2s ease, transform 0.2s ease !important;
+    }
+
+    .preview-item:hover {
+        background: rgba(79, 70, 229, 0.05);
+        border-radius: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+        transform: translateX(5px);
+    }
+
+    body.dark-mode .preview-item:hover {
+        background: rgba(99, 102, 241, 0.1);
+    }
+
+    /* Animation du bouton configurateur plus fluide */
+    .btn-configurator {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-configurator:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-configurator:active {
+        transform: scale(0.98);
+    }
+
+    /* Animation plus douce pour le badge */
+    .maintenance-badge {
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { 
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% { 
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+    }
+
+    /* Optimisation pour les performances */
+    .feature-card,
+    .command-category,
+    .tab-button,
+    .step {
+        will-change: transform, opacity;
+    }
+
+    /* Transitions instantanées pour le contenu critique */
+    .configurator-panel,
+    .config-preview {
+        transition: none;
+    }
+
+    .configurator-panel *,
+    .config-preview * {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* Search highlight amélioré */
     .search-highlight {
         background: #fbbf24;
         color: #1e293b;
@@ -874,6 +949,11 @@ functionalitiesStyles.textContent = `
         border-radius: 3px;
         font-weight: 600;
         animation: highlight 0.3s ease;
+    }
+
+    body.dark-mode .search-highlight {
+        background: #f59e0b;
+        color: #0f172a;
     }
 
     @keyframes highlight {
@@ -902,31 +982,6 @@ functionalitiesStyles.textContent = `
         left: 100%;
     }
 
-    /* Amélioration pour les appareils tactiles */
-    @media (hover: none) {
-        .command-item code::after {
-            content: 'Toucher pour copier';
-        }
-
-        .feature-card:hover::after,
-        .tab-button::before {
-            display: none;
-        }
-    }
-
-    /* Animation des badges de maintenance */
-    .maintenance-badge {
-        animation: pulse 2s ease-in-out infinite;
-    }
-
-    /* Transitions fluides pour le mode sombre */
-    .feature-card,
-    .command-category,
-    .tab-button,
-    .step {
-        transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-    }
-
     /* Focus amélioré pour l'accessibilité */
     .tab-button:focus-visible {
         outline: 2px solid #4f46e5;
@@ -937,11 +992,6 @@ functionalitiesStyles.textContent = `
     .feature-search:focus-visible {
         outline: 2px solid #4f46e5;
         outline-offset: 2px;
-    }
-
-    /* Styles pour les tooltips des commandes */
-    .command-item code:hover::after {
-        animation: fadeIn 0.3s ease;
     }
 
     /* Amélioration du focus pour l'accessibilité */
@@ -964,6 +1014,50 @@ functionalitiesStyles.textContent = `
         background: #4b5563;
         border-color: #6b7280;
         color: #e5e7eb;
+    }
+
+    /* Responsive pour mobile */
+    @media (max-width: 768px) {
+        .search-highlight {
+            padding: 1px 3px;
+            font-size: 0.9em;
+        }
+
+        .feature-search {
+            font-size: 16px; /* Évite le zoom sur iOS */
+        }
+    }
+
+    /* États spéciaux pour reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        .preview-item,
+        .feature-card,
+        .command-category,
+        .step {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+    }
+
+    /* Contrast élevé */
+    @media (prefers-contrast: high) {
+        .search-highlight {
+            background: #000000 !important;
+            color: #ffffff !important;
+            border: 1px solid #ffffff;
+        }
+
+        body.dark-mode .search-highlight {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #000000;
+        }
     }
 `;
 
