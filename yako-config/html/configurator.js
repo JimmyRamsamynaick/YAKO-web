@@ -654,6 +654,410 @@ class BotConfigurator {
         `).join('');
     }
 
+    // ========== FONCTIONS PREMIUM ==========
+
+    renderPremiumTab() {
+        console.log('🏆 Rendu de l\'onglet Premium');
+
+        // Initialiser les boutons de paiement
+        this.initPremiumButtons();
+
+        // Initialiser la copie des commandes Premium
+        this.initPremiumCommandCopy();
+
+        // Vérifier le statut Premium
+        this.checkPremiumStatus();
+    }
+
+    initPremiumButtons() {
+        const stripeButton = document.getElementById('stripePurchase');
+        const discordButton = document.getElementById('discordPurchase');
+
+        if (stripeButton) {
+            stripeButton.addEventListener('click', () => {
+                this.handleStripePurchase();
+            });
+        }
+
+        if (discordButton) {
+            discordButton.addEventListener('click', () => {
+                this.handleDiscordPurchase();
+            });
+        }
+
+        console.log('✅ Boutons Premium initialisés');
+    }
+
+    async handleStripePurchase() {
+        try {
+            this.showLoading('Redirection vers Stripe...');
+
+            // Simuler l'appel API pour obtenir l'URL de paiement Stripe
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            this.showNotification('💳 Redirection vers le paiement sécurisé Stripe', 'info', 3000);
+
+            // Ici tu ajouteras l'intégration réelle avec Stripe
+            // const response = await this.apiCall('/premium/stripe-checkout', 'POST', {
+            //     guild_id: this.selectedGuild?.id,
+            //     return_url: window.location.href
+            // });
+            //
+            // if (response.checkout_url) {
+            //     window.open(response.checkout_url, '_blank');
+            // }
+
+            setTimeout(() => {
+                this.hideLoading();
+                // Pour la démo, simuler l'activation Premium
+                this.simulatePremiumActivation();
+            }, 2000);
+
+        } catch (error) {
+            this.hideLoading();
+            console.error('❌ Erreur Stripe:', error);
+            this.showNotification('Erreur lors de la redirection vers Stripe', 'error');
+        }
+    }
+
+    async handleDiscordPurchase() {
+        try {
+            this.showLoading('Génération de la commande Discord...');
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const guildName = this.selectedGuild?.name || 'votre serveur';
+            const command = `/premium buy server:${this.selectedGuild?.id || 'ID_SERVEUR'}`;
+
+            // Copier la commande dans le presse-papiers
+            try {
+                await navigator.clipboard.writeText(command);
+                this.showNotification(`🤖 Commande copiée ! Utilisez-la dans ${guildName}`, 'success', 5000);
+            } catch (clipboardError) {
+                this.showNotification(`🤖 Utilisez cette commande dans ${guildName}: ${command}`, 'info', 8000);
+            }
+
+            this.hideLoading();
+
+            // Afficher les instructions
+            this.showPremiumInstructions(command);
+
+        } catch (error) {
+            this.hideLoading();
+            console.error('❌ Erreur Discord:', error);
+            this.showNotification('Erreur lors de la génération de la commande', 'error');
+        }
+    }
+
+    showPremiumInstructions(command) {
+        const instructionsHTML = `
+            <div style="text-align: center; padding: 1rem;">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fab fa-discord"></i> Achat via Discord
+                </h4>
+                <p style="margin-bottom: 1.5rem;">
+                    Suivez ces étapes pour activer Premium via Discord :
+                </p>
+                <div style="text-align: left; background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="margin-bottom: 0.5rem;">
+                        <strong>1.</strong> Allez dans votre serveur Discord
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        <strong>2.</strong> Tapez la commande suivante :
+                    </div>
+                    <code style="background: var(--surface); padding: 0.5rem; display: block; margin: 0.5rem 0; border-radius: 4px; color: var(--primary-color);">
+                        ${command}
+                    </code>
+                    <div style="margin-bottom: 0.5rem;">
+                        <strong>3.</strong> Suivez les instructions de paiement
+                    </div>
+                    <div>
+                        <strong>4.</strong> Votre Premium sera activé automatiquement
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                    💡 Le configurateur détectera automatiquement votre achat Premium
+                </p>
+            </div>
+        `;
+
+        this.showModal('confirmModal', {
+            title: 'Instructions d\'achat Premium',
+            body: instructionsHTML,
+            footer: `
+                <button class="btn btn-secondary" onclick="configurator.hideModal()">
+                    Fermer
+                </button>
+                <button class="btn btn-primary" onclick="configurator.refreshPremiumStatus()">
+                    <i class="fas fa-refresh"></i>
+                    Vérifier le statut
+                </button>
+            `
+        });
+    }
+
+    initPremiumCommandCopy() {
+        const premiumCommands = document.querySelectorAll('.premium-commands code');
+
+        premiumCommands.forEach(code => {
+            code.style.cursor = 'pointer';
+            code.title = 'Cliquer pour copier (Premium requis)';
+
+            code.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(code.textContent);
+
+                    // Effet visuel spécial Premium
+                    const originalBg = code.style.backgroundColor;
+                    const originalColor = code.style.color;
+
+                    code.style.backgroundColor = '#ffd700';
+                    code.style.color = '#1a202c';
+                    code.style.transform = 'scale(1.05)';
+
+                    // Icône premium
+                    const crownIcon = document.createElement('span');
+                    crownIcon.innerHTML = ' 👑';
+                    crownIcon.style.fontWeight = 'bold';
+                    code.appendChild(crownIcon);
+
+                    setTimeout(() => {
+                        code.style.backgroundColor = originalBg;
+                        code.style.color = originalColor;
+                        code.style.transform = 'scale(1)';
+                        if (crownIcon.parentNode) {
+                            crownIcon.remove();
+                        }
+                    }, 1000);
+
+                    this.showNotification('👑 Commande Premium copiée !', 'success', 3000);
+
+                } catch (err) {
+                    this.showNotification('❌ Erreur lors de la copie', 'error', 2000);
+                }
+            });
+
+            // Effet hover spécial
+            code.addEventListener('mouseenter', () => {
+                code.style.background = 'rgba(255, 215, 0, 0.3)';
+                code.style.borderColor = '#ffd700';
+                code.style.boxShadow = '0 0 10px rgba(255, 215, 0, 0.3)';
+            });
+
+            code.addEventListener('mouseleave', () => {
+                code.style.background = 'rgba(255, 215, 0, 0.1)';
+                code.style.borderColor = 'rgba(255, 215, 0, 0.3)';
+                code.style.boxShadow = 'none';
+            });
+        });
+
+        console.log('✅ Commandes Premium initialisées');
+    }
+
+    async checkPremiumStatus() {
+        try {
+            // Vérifier le statut Premium local d'abord
+            const localPremium = localStorage.getItem('yakoPremiumStatus') === 'true';
+
+            if (localPremium) {
+                this.showPremiumStatus();
+                return true;
+            }
+
+            // Si on a un serveur sélectionné, vérifier le statut Premium via API
+            if (this.selectedGuild) {
+                // const response = await this.apiCall(`/premium/status/${this.selectedGuild.id}`);
+                // if (response.isPremium) {
+                //     this.showPremiumStatus();
+                //     return true;
+                // }
+            }
+
+            return false;
+        } catch (error) {
+            console.error('❌ Erreur vérification Premium:', error);
+            return false;
+        }
+    }
+
+    showPremiumStatus() {
+        // Ajouter un badge Premium à l'interface
+        if (!document.querySelector('.premium-status')) {
+            const premiumBadge = document.createElement('div');
+            premiumBadge.className = 'premium-status';
+            premiumBadge.innerHTML = `
+                <div style="background: linear-gradient(135deg, #ffd700, #f59e0b); 
+                            color: #1a202c; padding: 0.5rem 1rem; border-radius: 20px; 
+                            font-weight: 700; font-size: 0.8rem; display: flex; 
+                            align-items: center; gap: 0.5rem; cursor: pointer;"
+                     title="Premium activé">
+                    <i class="fas fa-crown"></i>
+                    PREMIUM
+                </div>
+            `;
+
+            // Ajouter un clic pour plus d'infos
+            premiumBadge.addEventListener('click', () => {
+                this.showPremiumInfo();
+            });
+
+            document.body.appendChild(premiumBadge);
+        }
+
+        // Modifier l'onglet Premium pour montrer qu'il est activé
+        const premiumTab = document.querySelector('[data-tab="premium"]');
+        if (premiumTab) {
+            premiumTab.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            premiumTab.innerHTML = `
+                <i class="fas fa-crown"></i>
+                Premium ✓
+            `;
+        }
+    }
+
+    showPremiumInfo() {
+        const premiumInfoHTML = `
+            <div style="text-align: center; padding: 1rem;">
+                <div style="background: linear-gradient(135deg, #ffd700, #f59e0b); 
+                            width: 80px; height: 80px; border-radius: 50%; 
+                            display: flex; align-items: center; justify-content: center; 
+                            margin: 0 auto 1rem; color: #1a202c; font-size: 2rem;">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    🎉 Premium Activé !
+                </h4>
+                <p style="margin-bottom: 1.5rem;">
+                    Vous avez accès à toutes les fonctionnalités Premium de YAKO
+                </p>
+                <div style="text-align: left; background: var(--background); padding: 1rem; border-radius: 8px;">
+                    <div style="margin-bottom: 0.5rem;">
+                        ✅ IA Conversationnelle avec ChatGPT
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        ✅ Économie Pro avec bourse virtuelle
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        ✅ Modération IA avancée
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        ✅ Analytics Pro et prédictions
+                    </div>
+                    <div style="margin-bottom: 0.5rem;">
+                        ✅ Événements automatiques
+                    </div>
+                    <div>
+                        ✅ Personnalisation ultime
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.showModal('confirmModal', {
+            title: 'Statut Premium',
+            body: premiumInfoHTML,
+            footer: `
+                <button class="btn btn-secondary" onclick="configurator.hideModal()">
+                    Fermer
+                </button>
+                <button class="btn btn-outline" onclick="configurator.managePremium()">
+                    <i class="fas fa-cog"></i>
+                    Gérer l'abonnement
+                </button>
+            `
+        });
+    }
+
+    simulatePremiumActivation() {
+        localStorage.setItem('yakoPremiumStatus', 'true');
+        this.showNotification('🎉 Premium activé avec succès !', 'success', 5000);
+        this.showPremiumStatus();
+
+        // Mettre à jour l'onglet Premium
+        this.renderPremiumTab();
+    }
+
+    async refreshPremiumStatus() {
+        this.showLoading('Vérification du statut Premium...');
+
+        try {
+            // Simuler une vérification API
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            const isPremium = await this.checkPremiumStatus();
+
+            if (isPremium) {
+                this.showNotification('✅ Premium détecté et activé !', 'success');
+            } else {
+                this.showNotification('❌ Premium non détecté', 'warning');
+            }
+
+        } catch (error) {
+            this.showNotification('Erreur lors de la vérification', 'error');
+        } finally {
+            this.hideLoading();
+            this.hideModal();
+        }
+    }
+
+    managePremium() {
+        const manageHTML = `
+            <div style="text-align: center; padding: 1rem;">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fas fa-cog"></i> Gestion Premium
+                </h4>
+                <p style="margin-bottom: 1.5rem;">
+                    Options de gestion de votre abonnement Premium
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button class="btn btn-outline" onclick="configurator.viewPremiumUsage()" style="width: 100%;">
+                        <i class="fas fa-chart-bar"></i>
+                        Voir l'utilisation
+                    </button>
+                    <button class="btn btn-outline" onclick="configurator.downloadPremiumInvoice()" style="width: 100%;">
+                        <i class="fas fa-file-invoice"></i>
+                        Télécharger la facture
+                    </button>
+                    <button class="btn btn-outline" onclick="configurator.cancelPremium()" style="width: 100%; color: var(--error);">
+                        <i class="fas fa-times"></i>
+                        Annuler l'abonnement
+                    </button>
+                </div>
+            </div>
+        `;
+
+        this.showModal('confirmModal', {
+            title: 'Gestion Premium',
+            body: manageHTML,
+            footer: `
+                <button class="btn btn-secondary" onclick="configurator.hideModal()">
+                    Retour
+                </button>
+            `
+        });
+    }
+
+    viewPremiumUsage() {
+        this.showNotification('📊 Fonctionnalité en cours de développement', 'info');
+    }
+
+    downloadPremiumInvoice() {
+        this.showNotification('📄 Fonctionnalité en cours de développement', 'info');
+    }
+
+    cancelPremium() {
+        this.showConfirmModal(
+            'Annuler Premium',
+            'Êtes-vous sûr de vouloir annuler votre abonnement Premium ? Vous perdrez l\'accès aux fonctionnalités avancées.',
+            () => {
+                localStorage.removeItem('yakoPremiumStatus');
+                document.querySelector('.premium-status')?.remove();
+                this.showNotification('Premium annulé', 'info');
+                location.reload();
+            }
+        );
+    }
+
     renderRoleRewards(rewards, roles) {
         return rewards.map((reward, index) => `
             <div class="config-row">
@@ -905,6 +1309,9 @@ class BotConfigurator {
             case 'logs':
                 this.renderLogsTab();
                 break;
+            case 'premium':
+                this.renderPremiumTab();
+                break;
         }
     }
 
@@ -1114,6 +1521,13 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Initialisation du configurateur...');
     configurator = new BotConfigurator();
     window.configurator = configurator;
+
+    // Exposer les fonctions Premium pour les tests
+    window.yakoPremium = {
+        simulate: () => configurator.simulatePremiumActivation(),
+        check: () => configurator.checkPremiumStatus(),
+        refresh: () => configurator.refreshPremiumStatus()
+    };
 });
 
 window.addEventListener('error', (e) => {

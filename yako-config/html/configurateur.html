@@ -144,6 +144,11 @@
                 <i class="fas fa-clipboard-list"></i>
                 Logs
             </button>
+            <!-- Onglet Premium -->
+            <button class="tab-btn" data-tab="premium">
+                <i class="fas fa-crown"></i>
+                Premium
+            </button>
         </div>
 
         <!-- Contenu des onglets -->
@@ -205,6 +210,198 @@
 
                 <div class="config-sections" id="logsConfig">
                     <!-- Sera rempli par JavaScript -->
+                </div>
+            </div>
+
+            <!-- Onglet Premium -->
+            <div class="tab-pane" id="premium-tab">
+                <div class="section-header">
+                    <h3><i class="fas fa-crown" style="color: #ffd700;"></i> YAKO Premium</h3>
+                    <p>Débloquez des fonctionnalités exclusives pour votre serveur</p>
+                </div>
+
+                <!-- Bannière Premium -->
+                <div class="premium-banner">
+                    <div class="premium-badge">
+                        <i class="fas fa-crown"></i>
+                        PREMIUM
+                    </div>
+                    <h3>Transformez votre serveur Discord</h3>
+                    <p>Accédez à des fonctionnalités révolutionnaires avec l'IA, l'économie avancée et bien plus</p>
+                    <div class="premium-price">
+                        <span class="price-amount">4.99€</span>
+                        <span class="price-period">/mois</span>
+                    </div>
+                </div>
+
+                <!-- Fonctionnalités Premium -->
+                <div class="config-sections premium-features">
+                    <!-- IA Conversationnelle -->
+                    <div class="config-section premium-feature">
+                        <h4><i class="fas fa-brain premium-icon"></i> IA Conversationnelle</h4>
+                        <p class="feature-description">Assistant IA personnel avec ChatGPT intégré</p>
+                        <div class="premium-commands">
+                            <code>/ai ask Comment créer un bon serveur Discord ?</code>
+                            <code>/ai image Un robot futuriste dans l'espace</code>
+                            <code>/ai translate Bonjour en japonais</code>
+                            <code>/ai summarize 50</code>
+                        </div>
+                        <div class="premium-benefits">
+                            <span class="benefit">💬 Conversations naturelles</span>
+                            <span class="benefit">🎨 Génération d'images</span>
+                            <span class="benefit">🌍 Traduction multilingue</span>
+                            <span class="benefit">📋 Résumés automatiques</span>
+                        </div>
+                    </div>
+
+                    <!-- Économie Pro -->
+                    <div class="config-section premium-feature">
+                        <h4><i class="fas fa-chart-line premium-icon"></i> Économie Pro</h4>
+                        <p class="feature-description">Système économique complet avec bourse virtuelle</p>
+                        <div class="premium-commands">
+                            <code>/stock buy TSLA 10</code>
+                            <code>/business create "Mon Restaurant"</code>
+                            <code>/loan request 5000</code>
+                            <code>/invest portfolio</code>
+                        </div>
+                        <div class="premium-benefits">
+                            <span class="benefit">📈 Bourse en temps réel</span>
+                            <span class="benefit">🏢 Création d'entreprises</span>
+                            <span class="benefit">💰 Système de prêts</span>
+                            <span class="benefit">📊 Investissements</span>
+                        </div>
+                    </div>
+
+                    <!-- Modération IA -->
+                    <div class="config-section premium-feature">
+                        <h4><i class="fas fa-shield-virus premium-icon"></i> Modération IA</h4>
+                        <p class="feature-description">Protection intelligente alimentée par l'IA</p>
+                        <div class="premium-commands">
+                            <code>/automod setup advanced</code>
+                            <code>/antiraid enable smart</code>
+                            <code>/scan user @suspect</code>
+                            <code>/toxicity analyze</code>
+                        </div>
+                        <div class="premium-benefits">
+                            <span class="benefit">🧠 Détection IA de toxicité</span>
+                            <span class="benefit">🛡️ Anti-raid intelligent</span>
+                            <span class="benefit">🔍 Scan de comptes</span>
+                            <span class="benefit">📸 Modération d'images</span>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Pro -->
+                    <div class="config-section premium-feature">
+                        <h4><i class="fas fa-analytics premium-icon"></i> Analytics Pro</h4>
+                        <p class="feature-description">Analyses approfondies avec prédictions</p>
+                        <div class="premium-commands">
+                            <code>/analytics dashboard</code>
+                            <code>/predict growth 30d</code>
+                            <code>/report generate weekly</code>
+                            <code>/stats behavior @user</code>
+                        </div>
+                        <div class="premium-benefits">
+                            <span class="benefit">📊 Tableaux de bord</span>
+                            <span class="benefit">🔮 Prédictions IA</span>
+                            <span class="benefit">📈 Analyses comportementales</span>
+                            <span class="benefit">📋 Rapports automatiques</span>
+                        </div>
+                    </div>
+
+                    <!-- Événements Auto -->
+                    <div class="config-section premium-feature">
+                        <h4><i class="fas fa-calendar-star premium-icon"></i> Événements Auto</h4>
+                        <p class="feature-description">Événements automatiques pour l'engagement</p>
+                        <div class="premium-commands">
+                            <code>/event schedule contest</code>
+                            <code>/quiz create auto "Culture générale"</code>
+                            <code>/treasure hunt start</code>
+                            <code>/giveaway auto daily</code>
+                        </div>
+                        <div class="premium-benefits">
+                            <span class="benefit">🎯 Concours automatiques</span>
+                            <span class="benefit">❓ Quiz programmés</span>
+                            <span class="benefit">🗺️ Chasses au trésor</span>
+                            <span class="benefit">🎁 Événements saisonniers</span>
+                        </div>
+                    </div>
+
+                    <!-- Personnalisation Ultime -->
+                    <div class="config-section premium-feature">
+                        <h4><i class="fas fa-palette premium-icon"></i> Personnalisation Ultime</h4>
+                        <p class="feature-description">Customisation complète de YAKO</p>
+                        <div class="premium-commands">
+                            <code>/custom command create !salut</code>
+                            <code>/theme set purple</code>
+                            <code>/integrate spotify</code>
+                            <code>/embed create welcome</code>
+                        </div>
+                        <div class="premium-benefits">
+                            <span class="benefit">⚙️ Commandes personnalisées</span>
+                            <span class="benefit">🎨 Thèmes sur mesure</span>
+                            <span class="benefit">🔗 Intégrations API</span>
+                            <span class="benefit">✨ Messages personnalisés</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section d'achat -->
+                <div class="premium-purchase">
+                    <div class="purchase-content">
+                        <h3><i class="fas fa-rocket"></i> Prêt à débloquer le potentiel de votre serveur ?</h3>
+                        <p>Rejoignez plus de <strong>15,000+ serveurs</strong> qui utilisent déjà YAKO Premium</p>
+
+                        <div class="premium-benefits-grid">
+                            <div class="benefit-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Toutes les fonctionnalités Premium</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-headset"></i>
+                                <span>Support prioritaire 24/7</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-star"></i>
+                                <span>Accès anticipé aux nouveautés</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-crown"></i>
+                                <span>Badge Premium exclusif</span>
+                            </div>
+                        </div>
+
+                        <div class="purchase-buttons">
+                            <button class="btn-premium stripe-payment" id="stripePurchase">
+                                <i class="fab fa-stripe"></i>
+                                <div>
+                                    <span>Acheter via Stripe</span>
+                                    <small>🔒 Paiement sécurisé</small>
+                                </div>
+                            </button>
+                            <button class="btn-premium discord-payment" id="discordPurchase">
+                                <i class="fab fa-discord"></i>
+                                <div>
+                                    <span>Acheter via Discord</span>
+                                    <small>🤖 Commande /premium</small>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div class="payment-info">
+                            <div class="info-item">
+                                <i class="fas fa-bolt"></i>
+                                <span><strong>Activation instantanée :</strong> YAKO détecte automatiquement votre achat Premium en moins de 2 minutes</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-undo"></i>
+                                <span><strong>Annulation facile :</strong> Résiliez à tout moment, vos fonctionnalités restent actives jusqu'à expiration</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-server"></i>
+                                <span><strong>Multi-serveurs :</strong> Un abonnement Premium fonctionne sur tous vos serveurs</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
